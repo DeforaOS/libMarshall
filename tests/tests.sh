@@ -97,7 +97,7 @@ target="$1"
 
 [ "$clean" -ne 0 ]			&& exit 0
 
-tests=""
+tests="includes"
 failures="call0"
 
 $DATE > "$target"
