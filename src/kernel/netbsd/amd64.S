@@ -28,7 +28,6 @@
 
 
 
-.global marshall_call
 .type marshall_call,@function
 marshall_call:
 	/* call the function */

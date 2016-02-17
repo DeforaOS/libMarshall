@@ -28,4 +28,22 @@
 
 
 
-#include "System/Marshall.h"
+.text
+
+
+/* marshall_call */
+.global marshall_call
+
+
+/* NetBSD */
+#if defined(__NetBSD__)
+# if defined(__amd64__)
+#  include "kernel/netbsd/amd64.S"
+# else
+#  warning Unsupported NetBSD architecture
+# endif
+
+/* Unknown */
+#else
+# warning Unsupported platform
+#endif
