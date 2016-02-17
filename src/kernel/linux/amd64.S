@@ -28,30 +28,10 @@
 
 
 
-.text
-
-
-/* marshall_call */
-.global marshall_call
-
-
-/* Linux */
-#if defined(__linux__)
-# if defined(__amd64__)
-#  include "kernel/linux/amd64.S"
-# else
-#  warning Unsupported Linux architecture
-# endif
-
-/* NetBSD */
-#elif defined(__NetBSD__)
-# if defined(__amd64__)
-#  include "kernel/netbsd/amd64.S"
-# else
-#  warning Unsupported NetBSD architecture
-# endif
-
-/* Unknown */
-#else
-# warning Unsupported platform
-#endif
+.type marshall_call,@function
+marshall_call:
+	/* call the function */
+	call	%rsi
+	/* FIXME always fail for the moment */
+	mov	$-1, %rax
+	ret
