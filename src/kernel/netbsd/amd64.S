@@ -32,4 +32,6 @@
 marshall_call:
 	/* call the function */
 	call	%rsi
+	/* FIXME always fail for the moment */
+	mov	$-1, %rax
 	ret

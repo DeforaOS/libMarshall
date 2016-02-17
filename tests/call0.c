@@ -57,11 +57,12 @@ static int _call0(void)
 /* main */
 int main(void)
 {
+	int ret;
 	Variable * res;
 	int32_t r = -1;
 
 	res = variable_new(VT_INT32, &r);
-	marshall_call(res, (MarshallCallback)_call0, 0, NULL);
+	ret = marshall_call(res, (MarshallCallback)_call0, 0, NULL);
 	variable_get_as(res, VT_INT32, &r);
-	return (res == 0) ? 0 : 2;
+	return (ret == 0) ? ((res == 0) ? 0 : 3) : 2;
 }

@@ -42,7 +42,7 @@ typedef void(*MarshallCallback)(void);
 
 
 /* prototypes */
-void marshall_call(Variable * ret, MarshallCallback callback,
+int marshall_call(Variable * ret, MarshallCallback callback,
 		size_t args_cnt, Variable ** args);
 
 #endif /* !LIBMARSHALL_SYSTEM_MARSHALL_H */
