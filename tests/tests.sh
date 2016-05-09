@@ -98,7 +98,15 @@ target="$1"
 [ "$clean" -ne 0 ]			&& exit 0
 
 tests="includes"
-failures="call0"
+failures=""
+case "$(uname -s)-$(uname -m)" in
+	NetBSD-amd64)
+		tests="$tests call0"
+		;;
+	*)
+		failures="$failures call0"
+		;;
+esac
 
 $DATE > "$target"
 FAILED=
