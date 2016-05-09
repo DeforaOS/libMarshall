@@ -32,7 +32,15 @@
 #define NULL		$0x0
 
 #define VT_NULL		$0x0
+#define VT_BOOL		$0x1
+#define VT_INT8		$0x2
+#define VT_UINT8	$0x3
+#define VT_INT16	$0x4
+#define VT_UINT16	$0x5
 #define VT_INT32	$0x6
+#define VT_UINT32	$0x7
+#define VT_INT64	$0x8
+#define VT_UINT64	$0x9
 
 
 .type marshall_call,@function
@@ -70,13 +78,25 @@ call_done:
 return:
 	/* report the value returned */
 	cmp	VT_NULL, -0x28(%rbp)
-	je	return_VT_NULL
+	je	return_NULL
+	cmp	VT_BOOL, -0x28(%rbp)
+	je	return_INTEGER
+	cmp	VT_INT8, -0x28(%rbp)
+	je	return_INTEGER
+	cmp	VT_UINT8, -0x28(%rbp)
+	je	return_INTEGER
+	cmp	VT_INT16, -0x28(%rbp)
+	je	return_INTEGER
+	cmp	VT_UINT16, -0x28(%rbp)
+	je	return_INTEGER
 	cmp	VT_INT32, -0x28(%rbp)
-	je	return_VT_INT32
+	je	return_INTEGER
+	cmp	VT_UINT32, -0x28(%rbp)
+	je	return_INTEGER
 	jmp	error
-return_VT_NULL:
+return_NULL:
 	jmp	return_done
-return_VT_INT32:
+return_INTEGER:
 	mov	-0x08(%rbp), %rdi
 	mov	-0x28(%rbp), %rsi
 	mov	%rax, -0x28(%rbp)		/* XXX scratch VariableType */
