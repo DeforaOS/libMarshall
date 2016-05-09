@@ -100,7 +100,7 @@ target="$1"
 tests="includes"
 failures=""
 case "$(uname -s)-$(uname -m)" in
-	NetBSD-amd64)
+	*-amd64|*-x86_64)
 		tests="$tests call0"
 		;;
 	*)
