@@ -65,5 +65,5 @@ int main(void)
 		return 2;
 	ret = marshall_call(res, (MarshallCallback)_call0, 0, NULL);
 	variable_get_as(res, VT_INT32, &r);
-	return (ret == 0) ? ((res == 0) ? 0 : 3) : 3;
+	return (ret == 0) ? ((r == 0) ? 0 : 3) : 3;
 }
