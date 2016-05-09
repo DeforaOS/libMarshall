@@ -106,6 +106,8 @@ return_INTEGER:
 #else
 	call	variable_set_from
 #endif
+	cmp	$0x0, %rax
+	jne	error
 	jmp	return_done
 return_done:
 	mov	$0x0, %rax
