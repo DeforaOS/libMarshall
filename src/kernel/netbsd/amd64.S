@@ -28,10 +28,71 @@
 
 
 
+/* constants */
+#define NULL		$0x0
+
+#define VT_NULL		$0x0
+#define VT_INT32	$0x6
+
+
 .type marshall_call,@function
 marshall_call:
+	push	%rbp
+	mov	%rsp, %rbp
+	sub	$0x28, %rsp
+	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
+	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
+	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
+	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
+	movl	$0x0, -0x28(%rbp)		/* VariableType */
+type:
+	/* get the return type */
+	cmp	NULL, %rdi
+	je	type_done
+#ifdef __PIC__
+	call	variable_get_type@PLT
+#else
+	call	variable_get_type
+#endif
+	mov	%rax, -0x28(%rbp)
+type_done:
+args:
+	mov	-0x18(%rbp), %rdi
+	cmp	$0x0, %rdi
+	je	args_done
+	/* FIXME implement arguments */
+	jmp	error
+args_done:
+call:
 	/* call the function */
 	call	*%rsi
-	/* FIXME always fail for the moment */
+call_done:
+return:
+	/* report the value returned */
+	cmp	VT_NULL, -0x28(%rbp)
+	je	return_VT_NULL
+	cmp	VT_INT32, -0x28(%rbp)
+	je	return_VT_INT32
+	jmp	error
+return_VT_NULL:
+	jmp	return_done
+return_VT_INT32:
+	mov	-0x08(%rbp), %rdi
+	mov	-0x28(%rbp), %rsi
+	mov	%rax, -0x28(%rbp)		/* XXX scratch VariableType */
+	lea	-0x28(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_set_from@PLT
+#else
+	call	variable_set_from
+#endif
+	jmp	return_done
+return_done:
+	mov	$0x0, %rax
+	jmp	ret
+error:
 	mov	$-1, %rax
+ret:
+	mov	%rbp, %rsp
+	pop	%rbp
 	ret
