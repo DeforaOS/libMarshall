@@ -61,8 +61,9 @@ int main(void)
 	Variable * res;
 	int32_t r = -1;
 
-	res = variable_new(VT_INT32, &r);
+	if((res = variable_new(VT_INT32, &r)) == NULL)
+		return 2;
 	ret = marshall_call(res, (MarshallCallback)_call0, 0, NULL);
 	variable_get_as(res, VT_INT32, &r);
-	return (ret == 0) ? ((res == 0) ? 0 : 3) : 2;
+	return (ret == 0) ? ((res == 0) ? 0 : 3) : 3;
 }
