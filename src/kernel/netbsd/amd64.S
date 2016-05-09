@@ -41,6 +41,7 @@
 #define VT_UINT32	$0x7
 #define VT_INT64	$0x8
 #define VT_UINT64	$0x9
+#define VT_STRING	$0xd
 
 
 .type marshall_call,@function
@@ -93,6 +94,8 @@ return:
 	je	return_INTEGER
 	cmp	VT_UINT32, -0x28(%rbp)
 	je	return_INTEGER
+	cmp	VT_STRING, -0x28(%rbp)
+	je	return_POINTER
 	jmp	error
 return_NULL:
 	jmp	return_done
@@ -101,6 +104,13 @@ return_INTEGER:
 	mov	-0x28(%rbp), %rsi
 	mov	%rax, -0x28(%rbp)		/* XXX scratch VariableType */
 	lea	-0x28(%rbp), %rdx
+	jmp	return_variable_set
+return_POINTER:
+	mov	-0x08(%rbp), %rdi
+	mov	-0x28(%rbp), %rsi
+	mov	%rax, %rdx
+	jmp	return_variable_set
+return_variable_set:
 #ifdef __PIC__
 	call	variable_set_from@PLT
 #else
