@@ -35,20 +35,15 @@
 .global marshall_call
 
 
-/* Linux */
-#if defined(__linux__)
-# if defined(__amd64__)
-#  include "kernel/linux/amd64.S"
+/* amd64 */
+#if defined(__amd64__)
+# if defined(__FreeBSD__) \
+	|| defined(__linux__) \
+	|| defined(__NetBSD__) \
+	|| defined(__OpenBSD__)
+#  include "arch/amd64/sysv.S"
 # else
-#  warning Unsupported Linux architecture
-# endif
-
-/* NetBSD */
-#elif defined(__NetBSD__)
-# if defined(__amd64__)
-#  include "kernel/netbsd/amd64.S"
-# else
-#  warning Unsupported NetBSD architecture
+#  warning Unsupported AMD64 ABI
 # endif
 
 /* Unknown */
