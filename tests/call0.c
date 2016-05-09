@@ -29,6 +29,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include "System/Marshall.h"
 
 #ifndef PROGNAME
@@ -38,16 +39,27 @@
 
 /* private */
 /* prototypes */
-static int _call0(void);
+static int _call0_int32(void);
+static char const * _call0_string(void);
 
 
 /* functions */
-/* call0 */
-static int _call0(void)
+/* call0_int32 */
+static int _call0_int32(void)
 {
 	int ret = 0x41424344;
 
 	fprintf(stderr, "%s: %s() => %d\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
+/* call0_string */
+static char const * _call0_string(void)
+{
+	static char ret[] = "_call0_string";
+
+	fprintf(stderr, "%s: %s() => \"%s\"\n", PROGNAME, __func__, ret);
 	return ret;
 }
 
@@ -60,10 +72,25 @@ int main(void)
 	int ret;
 	Variable * res;
 	int32_t r = -1;
+	char * s;
 
 	if((res = variable_new(VT_INT32, &r)) == NULL)
 		return 2;
-	ret = marshall_call(res, (MarshallCallback)_call0, 0, NULL);
-	variable_get_as(res, VT_INT32, &r);
-	return (ret == 0) ? ((r == 0x41424344) ? 0 : 3) : 3;
+	if((ret = marshall_call(res, (MarshallCallback)_call0_int32, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_INT32, &r);
+	variable_delete(res);
+	if(ret != 0 || r != 0x41424344)
+		return 3;
+	if((res = variable_new(VT_STRING, "")) == NULL)
+		return 4;
+	if((ret = marshall_call(res, (MarshallCallback)_call0_string, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_STRING, &s);
+	variable_delete(res);
+	if(ret != 0)
+		return 5;
+	if(strcmp(s, "_call0_string") != 0)
+		return 6;
+	return 0;
 }
