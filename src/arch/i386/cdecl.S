@@ -28,18 +28,7 @@
 
 
 
-/* constants */
-#define NULL		$0x0
-
-#define VT_NULL		$0x0
-#define VT_BOOL		$0x1
-#define VT_INT8		$0x2
-#define VT_UINT8	$0x3
-#define VT_INT16	$0x4
-#define VT_UINT16	$0x5
-#define VT_INT32	$0x6
-#define VT_UINT32	$0x7
-#define VT_STRING	$0xd
+#include "../common.h"
 
 
 .type marshall_call,@function
