@@ -49,7 +49,7 @@ static int _call0_int32(void)
 {
 	int ret = 0x41424344;
 
-	fprintf(stderr, "%s: %s() => %d\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s() => 0x%08x\n", PROGNAME, __func__, ret);
 	return ret;
 }
 
