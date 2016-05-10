@@ -80,17 +80,19 @@ int main(void)
 			== 0)
 		ret = variable_get_as(res, VT_INT32, &r);
 	variable_delete(res);
-	if(ret != 0 || r != 0x41424344)
+	if(ret != 0)
 		return 3;
-	if((res = variable_new(VT_STRING, "")) == NULL)
+	if(r != 0x41424344)
 		return 4;
+	if((res = variable_new(VT_STRING, "")) == NULL)
+		return 5;
 	if((ret = marshall_call(res, (MarshallCallback)_call0_string, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_STRING, &s);
 	variable_delete(res);
 	if(ret != 0)
-		return 5;
-	if(strcmp(s, "_call0_string") != 0)
 		return 6;
+	if(strcmp(s, "_call0_string") != 0)
+		return 7;
 	return 0;
 }
