@@ -103,6 +103,9 @@ case "$(uname -s)-$(uname -m)" in
 	*-amd64|*-x86_64)
 		tests="$tests call0"
 		;;
+	*-i386)
+		tests="$tests call0"
+		;;
 	*)
 		failures="$failures call0"
 		;;
