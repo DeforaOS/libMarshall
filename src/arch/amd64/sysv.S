@@ -94,6 +94,10 @@ return:
 	je	return_INTEGER
 	cmp	VT_UINT32, -0x28(%rbp)
 	je	return_INTEGER
+	cmp	VT_INT64, -0x28(%rbp)
+	je	return_INTEGER
+	cmp	VT_UINT64, -0x28(%rbp)
+	je	return_INTEGER
 	cmp	VT_STRING, -0x28(%rbp)
 	je	return_POINTER
 	jmp	error
