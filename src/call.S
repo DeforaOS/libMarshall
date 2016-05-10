@@ -46,6 +46,17 @@
 #  warning Unsupported AMD64 ABI
 # endif
 
+/* i386 */
+#elif defined(__i386__)
+# if defined(__FreeBSD__) \
+	|| defined(__linux__) \
+	|| defined(__NetBSD__) \
+	|| defined(__OpenBSD__)
+#  include "arch/i386/cdecl.S"
+# else
+#  warning Unsupported x86 ABI
+# endif
+
 /* Unknown */
 #else
 # warning Unsupported platform
