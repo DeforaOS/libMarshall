@@ -45,7 +45,7 @@ type:
 	push	%eax
 	call	variable_get_type
 	mov	%eax, -0x4(%ebp)
-	add	$0x4, %esp
+	add	$0x8, %esp
 type_done:
 args:
 	cmpl	$0x0, 0x10(%ebp)		/* XXX size_t */
@@ -76,6 +76,10 @@ return:
 	je	return_INTEGER
 	cmpl	VT_UINT32, -0x4(%ebp)
 	je	return_INTEGER
+	cmpl	VT_INT64, -0x4(%ebp)
+	je	return_INTEGER64
+	cmpl	VT_UINT64, -0x4(%ebp)
+	je	return_INTEGER64
 	cmpl	VT_STRING, -0x4(%ebp)
 	je	return_POINTER
 	jmp	error
@@ -83,6 +87,16 @@ return_NULL:
 	jmp	return_done
 return_INTEGER:
 	mov	%eax, -0x8(%ebp)
+	lea	-0x8(%ebp), %eax		/* &value */
+	push	%eax
+	mov	-0x4(%ebp), %eax		/* VariableType type */
+	push	%eax
+	mov	0x8(%ebp), %eax			/* Variable * ret */
+	push	%eax
+	jmp	return_variable_set_from
+return_INTEGER64:
+	mov	%edx, -0x8(%ebp)
+	mov	%eax, -0xc(%ebp)
 	lea	-0x8(%ebp), %eax		/* &value */
 	push	%eax
 	mov	-0x4(%ebp), %eax		/* VariableType type */
