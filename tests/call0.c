@@ -39,17 +39,28 @@
 
 /* private */
 /* prototypes */
-static int _call0_int32(void);
+static int32_t _call0_int32(void);
+static int64_t _call0_int64(void);
 static char const * _call0_string(void);
 
 
 /* functions */
 /* call0_int32 */
-static int _call0_int32(void)
+static int32_t _call0_int32(void)
 {
-	int ret = 0x41424344;
+	int32_t ret = 0x41424344;
 
 	fprintf(stderr, "%s: %s() => 0x%08x\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
+/* call0_int64 */
+static int64_t _call0_int64(void)
+{
+	int64_t ret = 0x4142434445464748;
+
+	fprintf(stderr, "%s: %s() => 0x%016x\n", PROGNAME, __func__, ret);
 	return ret;
 }
 
@@ -71,28 +82,42 @@ int main(void)
 {
 	int ret;
 	Variable * res;
-	int32_t r = -1;
+	int32_t r32 = -1;
+	int64_t r64 = -1;
 	char * s;
 
-	if((res = variable_new(VT_INT32, &r)) == NULL)
+	/* VT_INT32 */
+	if((res = variable_new(VT_INT32, &r32)) == NULL)
 		return 2;
 	if((ret = marshall_call(res, (MarshallCallback)_call0_int32, 0, NULL))
 			== 0)
-		ret = variable_get_as(res, VT_INT32, &r);
+		ret = variable_get_as(res, VT_INT32, &r32);
 	variable_delete(res);
 	if(ret != 0)
 		return 3;
-	if(r != 0x41424344)
+	if(r32 != 0x41424344)
 		return 4;
-	if((res = variable_new(VT_STRING, "")) == NULL)
+	/* VT_INT64 */
+	if((res = variable_new(VT_INT64, &r64)) == NULL)
 		return 5;
+	if((ret = marshall_call(res, (MarshallCallback)_call0_int64, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_INT64, &r64);
+	variable_delete(res);
+	if(ret != 0)
+		return 6;
+	if(r64 != 0x4142434445464748)
+		return 7;
+	/* VT_STRING */
+	if((res = variable_new(VT_STRING, "")) == NULL)
+		return 8;
 	if((ret = marshall_call(res, (MarshallCallback)_call0_string, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_STRING, &s);
 	variable_delete(res);
 	if(ret != 0)
-		return 6;
+		return 9;
 	if(strcmp(s, "_call0_string") != 0)
-		return 7;
+		return 10;
 	return 0;
 }
