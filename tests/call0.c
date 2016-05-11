@@ -28,6 +28,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include "System/Marshall.h"
@@ -50,7 +51,8 @@ static int32_t _call0_int32(void)
 {
 	int32_t ret = 0x41424344;
 
-	fprintf(stderr, "%s: %s() => 0x%08x\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s() => 0x%08" PRIx32 "\n", PROGNAME, __func__,
+			ret);
 	return ret;
 }
 
@@ -60,7 +62,8 @@ static int64_t _call0_int64(void)
 {
 	int64_t ret = 0x4142434445464748;
 
-	fprintf(stderr, "%s: %s() => 0x%016x\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s() => 0x%016" PRIx64 "\n", PROGNAME, __func__,
+			ret);
 	return ret;
 }
 
