@@ -55,12 +55,11 @@ static void _calln(void)
 /* main */
 int main(void)
 {
-	int ret = 0;
 	size_t i;
 
 	for(i = 0; i < 10; i++)
 		/* FIXME really transmit i parameters */
 		if(marshall_call(NULL, (MarshallCallback)_calln, i, NULL) != 0)
-			ret |= (1 << i);
-	return ret;
+			return i + 2;
+	return 0;
 }
