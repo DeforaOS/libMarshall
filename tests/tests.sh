@@ -98,7 +98,7 @@ target="$1"
 [ "$clean" -ne 0 ]			&& exit 0
 
 tests="includes"
-failures=""
+failures="calln"
 case "$(uname -s)-$(uname -m)" in
 	*-amd64|*-x86_64)
 		tests="$tests call0"
