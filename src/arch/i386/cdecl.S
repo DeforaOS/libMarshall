@@ -35,17 +35,17 @@
 marshall_call:
 	push	%ebp
 	mov	%esp, %ebp
-	sub	$0x8, %esp			/* VariableType type */
-						/* int value */
+	sub	$0xc, %esp			/* VariableType type */
+						/* uint64_t res */
+	movl	$0x0, -0x4(%ebp)		/* type = 0 */
 type:
 	/* get the return type */
-	cmpl	NULL, -0x4(%esp)
+	cmpl	NULL, 0x8(%ebp)
 	je	type_done
-	mov	0x8(%ebp), %eax
-	push	%eax
+	pushl	0x8(%ebp)
 	call	variable_get_type
 	mov	%eax, -0x4(%ebp)
-	add	$0x8, %esp
+	add	$0x4, %esp
 type_done:
 args:
 	cmpl	$0x0, 0x10(%ebp)		/* XXX size_t */
@@ -89,34 +89,27 @@ return_INTEGER:
 	mov	%eax, -0x8(%ebp)
 	lea	-0x8(%ebp), %eax		/* &value */
 	push	%eax
-	mov	-0x4(%ebp), %eax		/* VariableType type */
-	push	%eax
-	mov	0x8(%ebp), %eax			/* Variable * ret */
-	push	%eax
+	pushl	-0x4(%ebp)			/* VariableType type */
+	pushl	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
 return_INTEGER64:
 	mov	%edx, -0x8(%ebp)
 	mov	%eax, -0xc(%ebp)
-	lea	-0x8(%ebp), %eax		/* &value */
+	lea	-0xc(%ebp), %eax		/* &value */
 	push	%eax
-	mov	-0x4(%ebp), %eax		/* VariableType type */
-	push	%eax
-	mov	0x8(%ebp), %eax			/* Variable * ret */
-	push	%eax
+	pushl	-0x4(%ebp)			/* VariableType type */
+	pushl	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
 return_POINTER:
 	push	%eax				/* void * value */
-	mov	-0x4(%ebp), %eax		/* VariableType type */
-	push	%eax
-	mov	0x8(%ebp), %eax			/* Variable * ret */
-	push	%eax
+	pushl	-0x4(%ebp)			/* VariableType type */
+	pushl	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
 return_variable_set_from:
 	call	variable_set_from
 	add	$0xc, %esp
 	cmp	$0x0, %eax
 	jne	error
-	jmp	return_done
 return_done:
 	mov	$0x0, %eax			/* return 0 */
 	jmp	ret
