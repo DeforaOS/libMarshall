@@ -35,17 +35,25 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0x28, %rsp
+	sub	$0x68, %rsp
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
-	movl	$0x0, -0x28(%rbp)		/* VariableType */
+	movq	$0x0, -0x28(%rbp)		/* VariableType */
+	movq	$0x0, -0x30(%rbp)		/* size_t args_pos */
+	movq	$0x0, -0x38(%rbp)		/* long rdi */
+	movq	$0x0, -0x40(%rbp)		/* long rsi */
+	movq	$0x0, -0x48(%rbp)		/* long rdx */
+	movq	$0x0, -0x50(%rbp)		/* long rcx */
+	movq	$0x0, -0x58(%rbp)		/* long r8 */
+	movq	$0x0, -0x60(%rbp)		/* long r9 */
+	movq	$0x0, -0x68(%rbp)		/* size_t offset */
 type:
 	/* get the return type */
-	cmp	NULL, %rdi
+	cmpq	NULL, %rdi
 	je	type_done
-#ifdef __PIC__
+#ifdef __PIC__					/* variable_get_type() */
 	call	variable_get_type@PLT
 #else
 	call	variable_get_type
@@ -53,39 +61,91 @@ type:
 	mov	%rax, -0x28(%rbp)
 type_done:
 args:
-	mov	-0x18(%rbp), %rdi
-	cmp	$0x0, %rdi
-	je	args_done
-	/* FIXME implement arguments */
+	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
+	mov	-0x18(%rbp), %rdx
+	cmp	%rdx, %rdi
+	je	args_done			/* 	goto args_done */
+	jg	args_error			/* else if(args_pos > args_cnt)
+							goto args_error */
+	/* FIXME assumes integers */
+args_integer:
+	mov	-0x20(%rbp), %rax
+	mov	(%rax), %rdi
+	/* FIXME apply offset */
+	mov	VT_INT32, %rsi
+	lea	-0x60(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	args_error			/*	goto args_error */
+	mov	-0x60(%rbp), %rax
+	cmpq	$0x0, -0x30(%rbp)
+	je	args_integer_0
+	cmpq	$0x1, -0x30(%rbp)
+	je	args_integer_1
+	cmpq	$0x2, -0x30(%rbp)
+	je	args_integer_2
+	cmpq	$0x3, -0x30(%rbp)
+	je	args_integer_3
+	cmpq	$0x4, -0x30(%rbp)
+	je	args_integer_4
+	cmpq	$0x5, -0x30(%rbp)
+	je	args_integer_5
+	cmpq	$0x6, -0x30(%rbp)
+	jge	args_integer_more
+	jmp	error
+args_integer_0:
+	mov	%rax, -0x38(%rbp)		/* rdi */
+	jmp	args_loop
+args_integer_1:
+	mov	%rax, -0x40(%rbp)		/* rsi */
+	jmp	args_loop
+args_integer_2:
+	mov	%rax, -0x48(%rbp)		/* rdx */
+	jmp	args_loop
+args_integer_3:
+	mov	%rax, -0x50(%rbp)		/* rcx */
+	jmp	args_loop
+args_integer_4:
+	mov	%rax, -0x58(%rbp)		/* r8 */
+	jmp	args_loop
+args_integer_5:
+	mov	%rax, -0x60(%rbp)		/* r9 */
+	jmp	args_loop
+args_integer_more:
+	push	%rax				/* stack */
+	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	jmp	args_loop
+args_loop:
+	incq	-0x30(%rbp)			/* args_pos++ */
+	jmp	args
+args_error:
+	sub	-0x68(%rbp), %rsp		/* rsp -= offset */
 	jmp	error
 args_done:
 call:
 	/* call the function */
-	call	*%rsi
+	mov	-0x10(%rbp), %rax		/* callback() */
+	mov	-0x38(%rbp), %rdi
+	mov	-0x40(%rbp), %rsi
+	mov	-0x48(%rbp), %rdx
+	mov	-0x50(%rbp), %rcx
+	mov	-0x58(%rbp), %r8
+	mov	-0x60(%rbp), %r9
+	call	*%rax
+	sub	-0x68(%rbp), %rsp		/* rsp -= offset */
 call_done:
 return:
 	/* report the value returned */
-	cmp	VT_NULL, -0x28(%rbp)
+	cmpq	VT_NULL, -0x28(%rbp)
 	je	return_NULL
-	cmp	VT_BOOL, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_INT8, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_UINT8, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_INT16, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_UINT16, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_INT32, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_UINT32, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_INT64, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_UINT64, -0x28(%rbp)
-	je	return_INTEGER
-	cmp	VT_STRING, -0x28(%rbp)
+	/* FIXME make sure it is unsigned */
+	cmpq	VT_UINT64, -0x28(%rbp)
+	jle	return_INTEGER
+	cmpq	VT_STRING, -0x28(%rbp)
 	je	return_POINTER
 	jmp	error
 return_NULL:
@@ -102,7 +162,7 @@ return_POINTER:
 	mov	%rax, %rdx
 	jmp	return_variable_set
 return_variable_set:
-#ifdef __PIC__
+#ifdef __PIC__					/* variable_set_from() */
 	call	variable_set_from@PLT
 #else
 	call	variable_set_from
