@@ -29,8 +29,10 @@
 
 
 #include <inttypes.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <System/variable.h>
 #include "System/Marshall.h"
 
 #ifndef PROGNAME
@@ -40,13 +42,36 @@
 
 /* private */
 /* prototypes */
-static void _calln(void);
+static void _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
+		int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7,
+		int32_t arg8, int32_t arg9);
 
 
 /* functions */
 /* calln */
-static void _calln(void)
+static void _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
+		int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7,
+		int32_t arg8, int32_t arg9)
 {
+	fprintf(stderr, "%s: %s(%d)\n", PROGNAME, __func__, count);
+	if(count >= 1)
+		fprintf(stderr, "%d: %d\n", count, arg1);
+	if(count >= 2)
+		fprintf(stderr, "%d: %d\n", count, arg2);
+	if(count >= 3)
+		fprintf(stderr, "%d: %d\n", count, arg3);
+	if(count >= 4)
+		fprintf(stderr, "%d: %d\n", count, arg4);
+	if(count >= 5)
+		fprintf(stderr, "%d: %d\n", count, arg5);
+	if(count >= 6)
+		fprintf(stderr, "%d: %d\n", count, arg6);
+	if(count >= 7)
+		fprintf(stderr, "%d: %d\n", count, arg7);
+	if(count >= 8)
+		fprintf(stderr, "%d: %d\n", count, arg8);
+	if(count >= 9)
+		fprintf(stderr, "%d: %d\n", count, arg9);
 }
 
 
@@ -55,11 +80,32 @@ static void _calln(void)
 /* main */
 int main(void)
 {
+	int ret = 0;
 	size_t i;
+	const size_t count = 10;
+	Variable ** args;
+	int32_t i32;
 
-	for(i = 0; i < 10; i++)
-		/* FIXME really transmit i parameters */
-		if(marshall_call(NULL, (MarshallCallback)_calln, i, NULL) != 0)
-			return i + 2;
-	return 0;
+	if((args = malloc(sizeof(*args) * count)) == NULL)
+		return 2;
+	for(i = 0; i < count; i++)
+	{
+		i32 = i;
+		if((args[i] = variable_new(VT_INT32, &i32)) == NULL)
+			ret = 3;
+	}
+	for(i = 0; ret == 0 && i < count; i++)
+	{
+		i32 = i;
+		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
+			ret = i + 3;
+		else if(marshall_call(NULL, (MarshallCallback)_calln, i, args)
+				!= 0)
+			ret = i + 3;
+	}
+	for(i = 0; i < count; i++)
+		if(args[i] != NULL)
+			variable_delete(args[i]);
+	free(args);
+	return ret;
 }
