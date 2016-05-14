@@ -90,7 +90,7 @@ int main(void)
 		return 2;
 	for(i = 0; i < count; i++)
 	{
-		i32 = i;
+		i32 = i * 1111;
 		if((args[i] = variable_new(VT_INT32, &i32)) == NULL)
 			ret = 3;
 	}
@@ -98,10 +98,10 @@ int main(void)
 	{
 		i32 = i;
 		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
-			ret = i + 3;
-		else if(marshall_call(NULL, (MarshallCallback)_calln, i, args)
-				!= 0)
-			ret = i + 3;
+			ret = i + 4;
+		else if(marshall_call(NULL, (MarshallCallback)_calln, i + 1,
+					args) != 0)
+			ret = i + 4;
 	}
 	for(i = 0; i < count; i++)
 		if(args[i] != NULL)
