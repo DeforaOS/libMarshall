@@ -70,8 +70,8 @@ args:
 	/* FIXME assumes integers */
 args_integer:
 	mov	-0x20(%rbp), %rax
-	mov	(%rax), %rdi
-	/* FIXME apply offset */
+	mov	-0x30(%rbp), %rdi
+	mov	(%rax, %rdi, 8), %rdi
 	mov	VT_INT32, %rsi
 	lea	-0x60(%rbp), %rdx
 #ifdef __PIC__
