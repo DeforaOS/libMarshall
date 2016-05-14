@@ -128,14 +128,14 @@ args_error:
 args_done:
 call:
 	/* call the function */
-	mov	-0x10(%rbp), %rax		/* callback() */
 	mov	-0x38(%rbp), %rdi
 	mov	-0x40(%rbp), %rsi
 	mov	-0x48(%rbp), %rdx
 	mov	-0x50(%rbp), %rcx
 	mov	-0x58(%rbp), %r8
 	mov	-0x60(%rbp), %r9
-	call	*%rax
+	mov	-0x10(%rbp), %rax
+	call	*%rax				/* callback() */
 	sub	-0x68(%rbp), %rsp		/* rsp -= offset */
 call_done:
 return:
