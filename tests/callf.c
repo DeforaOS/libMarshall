@@ -28,20 +28,75 @@
 
 
 
-/* constants */
-#define NULL		$0x0
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "System/Marshall.h"
 
-#define VT_NULL		$0x0
-#define VT_BOOL		$0x1
-#define VT_INT8		$0x2
-#define VT_UINT8	$0x3
-#define VT_INT16	$0x4
-#define VT_UINT16	$0x5
-#define VT_INT32	$0x6
-#define VT_UINT32	$0x7
-#define VT_INT64	$0x8
-#define VT_UINT64	$0x9
-#define VT_FLOAT	$0xa
-#define VT_DOUBLE	$0xb
-#define VT_BUFFER	$0xc
-#define VT_STRING	$0xd
+#ifndef PROGNAME
+# define PROGNAME	"callf"
+#endif
+
+
+/* private */
+/* prototypes */
+static double _callf_double(void);
+static float _callf_float(void);
+
+
+/* functions */
+/* callf_double */
+static double _callf_double(void)
+{
+	double ret = M_PI;
+
+	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
+/* callf_float */
+static float _callf_float(void)
+{
+	float ret = M_PI;
+
+	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
+/* public */
+/* functions */
+/* main */
+int main(void)
+{
+	int ret;
+	Variable * res;
+	float f = 0.0;
+	double d = 0.0;
+
+	/* VT_FLOAT */
+	if((res = variable_new(VT_FLOAT, &d)) == NULL)
+		return 2;
+	if((ret = marshall_call(res, (MarshallCallback)_callf_float, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_FLOAT, &f);
+	variable_delete(res);
+	if(ret != 0)
+		return 3;
+	if(f != (float)M_PI)
+		return 4;
+	/* VT_DOUBLE */
+	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
+		return 5;
+	if((ret = marshall_call(res, (MarshallCallback)_callf_double, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_DOUBLE, &d);
+	variable_delete(res);
+	if(ret != 0)
+		return 6;
+	if(d != M_PI)
+		return 7;
+	return 0;
+}

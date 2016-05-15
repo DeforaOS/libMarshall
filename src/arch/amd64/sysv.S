@@ -166,6 +166,8 @@ return:
 	/* FIXME make sure it is unsigned */
 	cmpq	VT_UINT64, -0x28(%rbp)
 	jle	return_INTEGER
+	cmpq	VT_DOUBLE, -0x28(%rbp)
+	jle	return_SSE
 	cmpq	VT_STRING, -0x28(%rbp)
 	je	return_POINTER
 	jmp	error
@@ -181,6 +183,10 @@ return_POINTER:
 	mov	-0x08(%rbp), %rdi
 	mov	-0x28(%rbp), %rsi
 	mov	%rax, %rdx
+	jmp	return_variable_set_from
+return_SSE:
+	movaps	%xmm0, -0x80(%rbp)
+	lea	-0x80(%rbp), %rdx
 	jmp	return_variable_set_from
 return_variable_set_from:
 #ifdef __PIC__					/* variable_set_from() */
