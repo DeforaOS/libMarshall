@@ -35,7 +35,7 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0x68, %rsp
+	sub	$0x78, %rsp
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
@@ -49,6 +49,8 @@ marshall_call:
 	movq	$0x0, -0x58(%rbp)		/* long r8 */
 	movq	$0x0, -0x60(%rbp)		/* long r9 */
 	movq	$0x0, -0x68(%rbp)		/* size_t offset */
+	movq	$0x0, -0x70(%rbp)		/* size_t args_cnt_integer */
+	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
@@ -73,7 +75,7 @@ args_integer:
 	mov	-0x30(%rbp), %rdi
 	mov	(%rax, %rdi, 8), %rdi
 	mov	VT_INT32, %rsi
-	lea	-0x60(%rbp), %rdx
+	lea	-0x78(%rbp), %rdx
 #ifdef __PIC__
 	call	variable_get_as@PLT
 #else
@@ -81,43 +83,47 @@ args_integer:
 #endif
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
-	mov	-0x60(%rbp), %rax
-	cmpq	$0x0, -0x30(%rbp)
+	mov	-0x78(%rbp), %rax
+	cmpq	$0x0, -0x70(%rbp)
 	je	args_integer_0
-	cmpq	$0x1, -0x30(%rbp)
+	cmpq	$0x1, -0x70(%rbp)
 	je	args_integer_1
-	cmpq	$0x2, -0x30(%rbp)
+	cmpq	$0x2, -0x70(%rbp)
 	je	args_integer_2
-	cmpq	$0x3, -0x30(%rbp)
+	cmpq	$0x3, -0x70(%rbp)
 	je	args_integer_3
-	cmpq	$0x4, -0x30(%rbp)
+	cmpq	$0x4, -0x70(%rbp)
 	je	args_integer_4
-	cmpq	$0x5, -0x30(%rbp)
+	cmpq	$0x5, -0x70(%rbp)
 	je	args_integer_5
-	cmpq	$0x6, -0x30(%rbp)
+	cmpq	$0x6, -0x70(%rbp)
 	jge	args_integer_more
 	jmp	error
 args_integer_0:
 	mov	%rax, -0x38(%rbp)		/* rdi */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_1:
 	mov	%rax, -0x40(%rbp)		/* rsi */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_2:
 	mov	%rax, -0x48(%rbp)		/* rdx */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_3:
 	mov	%rax, -0x50(%rbp)		/* rcx */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_4:
 	mov	%rax, -0x58(%rbp)		/* r8 */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_5:
 	mov	%rax, -0x60(%rbp)		/* r9 */
-	jmp	args_loop
+	jmp	args_integer_loop
 args_integer_more:
+	/* FIXME push in reverse order instead */
 	push	%rax				/* stack */
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	jmp	args_integer_loop
+args_integer_loop:
+	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	args_loop
 args_loop:
 	incq	-0x30(%rbp)			/* args_pos++ */
