@@ -35,7 +35,7 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0x80, %rsp
+	sub	$0x90, %rsp
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
@@ -52,6 +52,7 @@ marshall_call:
 	movq	$0x0, -0x70(%rbp)		/* size_t args_cnt_integer */
 	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
+	movq	$0x0, -0x88(%rbp)		/* size_t args_cnt_sse */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
@@ -84,6 +85,8 @@ args_type:
 	/* FIXME make sure it is unsigned */
 	cmp	VT_UINT64, %rax
 	jle	args_INTEGER
+	cmp	VT_DOUBLE, %rax
+	jle	args_SSE
 	jmp	args_error
 args_INTEGER:
 	mov	-0x20(%rbp), %rdx
@@ -139,6 +142,71 @@ args_INTEGER_more:
 	jmp	args_INTEGER_loop
 args_INTEGER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	jmp	args_loop
+args_SSE:
+	mov	-0x20(%rbp), %rdx
+	mov	-0x30(%rbp), %rdi
+	mov	(%rdx, %rdi, 8), %rdi
+	mov	%rax, %rsi
+	lea	-0x80(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	args_error			/*	goto args_error */
+	cmpq	$0x0, -0x88(%rbp)
+	je	args_SSE_0
+	cmpq	$0x1, -0x88(%rbp)
+	je	args_SSE_1
+	cmpq	$0x2, -0x88(%rbp)
+	je	args_SSE_2
+	cmpq	$0x3, -0x88(%rbp)
+	je	args_SSE_3
+	cmpq	$0x4, -0x88(%rbp)
+	je	args_SSE_4
+	cmpq	$0x5, -0x88(%rbp)
+	je	args_SSE_5
+	cmpq	$0x6, -0x88(%rbp)
+	je	args_SSE_6
+	cmpq	$0x7, -0x88(%rbp)
+	je	args_SSE_7
+	cmpq	$0x8, -0x88(%rbp)
+	jge	args_SSE_more
+	jmp	error
+args_SSE_0:
+	movaps	-0x80(%rbp), %xmm0
+	jmp	args_SSE_loop
+args_SSE_1:
+	movaps	-0x80(%rbp), %xmm1
+	jmp	args_SSE_loop
+args_SSE_2:
+	movaps	-0x80(%rbp), %xmm2
+	jmp	args_SSE_loop
+args_SSE_3:
+	movaps	-0x80(%rbp), %xmm3
+	jmp	args_SSE_loop
+args_SSE_4:
+	movaps	-0x80(%rbp), %xmm4
+	jmp	args_SSE_loop
+args_SSE_5:
+	movaps	-0x80(%rbp), %xmm5
+	jmp	args_SSE_loop
+args_SSE_6:
+	movaps	-0x80(%rbp), %xmm6
+	jmp	args_SSE_loop
+args_SSE_7:
+	movaps	-0x80(%rbp), %xmm7
+	jmp	args_SSE_loop
+args_SSE_more:
+	/* FIXME push in reverse order instead */
+	push	-0x78(%rbp)			/* stack */
+	push	-0x80(%rbp)
+	addq	$0x10, -0x68(%rbp)		/* offset += 16 */
+	jmp	args_SSE_loop
+args_SSE_loop:
+	incq	-0x88(%rbp)			/* args_cnt_sse++ */
 	jmp	args_loop
 args_loop:
 	incq	-0x30(%rbp)			/* args_pos++ */
