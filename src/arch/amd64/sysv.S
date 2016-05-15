@@ -86,10 +86,10 @@ args_type:
 	jle	args_INTEGER
 	jmp	args_error
 args_INTEGER:
-	mov	-0x20(%rbp), %rax
+	mov	-0x20(%rbp), %rdx
 	mov	-0x30(%rbp), %rdi
-	mov	(%rax, %rdi, 8), %rdi
-	mov	VT_INT32, %rsi
+	mov	(%rdx, %rdi, 8), %rdi
+	mov	%rax, %rsi
 	lea	-0x78(%rbp), %rdx
 #ifdef __PIC__
 	call	variable_get_as@PLT
