@@ -129,7 +129,7 @@ args_loop:
 	incq	-0x30(%rbp)			/* args_pos++ */
 	jmp	args
 args_error:
-	sub	-0x68(%rbp), %rsp		/* rsp -= offset */
+	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
 	jmp	error
 args_done:
 call:
@@ -142,7 +142,7 @@ call:
 	mov	-0x60(%rbp), %r9
 	mov	-0x10(%rbp), %rax
 	call	*%rax				/* callback() */
-	sub	-0x68(%rbp), %rsp		/* rsp -= offset */
+	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
 call_done:
 return:
 	/* report the value returned */
