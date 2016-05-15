@@ -176,13 +176,13 @@ return_INTEGER:
 	mov	-0x28(%rbp), %rsi
 	mov	%rax, -0x78(%rbp)
 	lea	-0x78(%rbp), %rdx
-	jmp	return_variable_set
+	jmp	return_variable_set_from
 return_POINTER:
 	mov	-0x08(%rbp), %rdi
 	mov	-0x28(%rbp), %rsi
 	mov	%rax, %rdx
-	jmp	return_variable_set
-return_variable_set:
+	jmp	return_variable_set_from
+return_variable_set_from:
 #ifdef __PIC__					/* variable_set_from() */
 	call	variable_set_from@PLT
 #else
