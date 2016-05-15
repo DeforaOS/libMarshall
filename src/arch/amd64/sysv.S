@@ -35,7 +35,7 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0x78, %rsp
+	sub	$0x80, %rsp
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
@@ -51,6 +51,7 @@ marshall_call:
 	movq	$0x0, -0x68(%rbp)		/* size_t offset */
 	movq	$0x0, -0x70(%rbp)		/* size_t args_cnt_integer */
 	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
+	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
