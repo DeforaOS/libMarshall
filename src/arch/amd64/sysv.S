@@ -82,9 +82,9 @@ args_type:
 	je	args_done
 	/* FIXME make sure it is unsigned */
 	cmp	VT_UINT64, %rax
-	jle	args_integer
+	jle	args_INTEGER
 	jmp	args_error
-args_integer:
+args_INTEGER:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi
 	mov	(%rax, %rdi, 8), %rdi
@@ -99,44 +99,44 @@ args_integer:
 	jne	args_error			/*	goto args_error */
 	mov	-0x78(%rbp), %rax
 	cmpq	$0x0, -0x70(%rbp)
-	je	args_integer_0
+	je	args_INTEGER_0
 	cmpq	$0x1, -0x70(%rbp)
-	je	args_integer_1
+	je	args_INTEGER_1
 	cmpq	$0x2, -0x70(%rbp)
-	je	args_integer_2
+	je	args_INTEGER_2
 	cmpq	$0x3, -0x70(%rbp)
-	je	args_integer_3
+	je	args_INTEGER_3
 	cmpq	$0x4, -0x70(%rbp)
-	je	args_integer_4
+	je	args_INTEGER_4
 	cmpq	$0x5, -0x70(%rbp)
-	je	args_integer_5
+	je	args_INTEGER_5
 	cmpq	$0x6, -0x70(%rbp)
-	jge	args_integer_more
+	jge	args_INTEGER_more
 	jmp	error
-args_integer_0:
+args_INTEGER_0:
 	mov	%rax, -0x38(%rbp)		/* rdi */
-	jmp	args_integer_loop
-args_integer_1:
+	jmp	args_INTEGER_loop
+args_INTEGER_1:
 	mov	%rax, -0x40(%rbp)		/* rsi */
-	jmp	args_integer_loop
-args_integer_2:
+	jmp	args_INTEGER_loop
+args_INTEGER_2:
 	mov	%rax, -0x48(%rbp)		/* rdx */
-	jmp	args_integer_loop
-args_integer_3:
+	jmp	args_INTEGER_loop
+args_INTEGER_3:
 	mov	%rax, -0x50(%rbp)		/* rcx */
-	jmp	args_integer_loop
-args_integer_4:
+	jmp	args_INTEGER_loop
+args_INTEGER_4:
 	mov	%rax, -0x58(%rbp)		/* r8 */
-	jmp	args_integer_loop
-args_integer_5:
+	jmp	args_INTEGER_loop
+args_INTEGER_5:
 	mov	%rax, -0x60(%rbp)		/* r9 */
-	jmp	args_integer_loop
-args_integer_more:
+	jmp	args_INTEGER_loop
+args_INTEGER_more:
 	/* FIXME push in reverse order instead */
 	push	%rax				/* stack */
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
-	jmp	args_integer_loop
-args_integer_loop:
+	jmp	args_INTEGER_loop
+args_INTEGER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	args_loop
 args_loop:
