@@ -69,7 +69,21 @@ args:
 	je	args_done			/* 	goto args_done */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto args_error */
-	/* FIXME assumes integers */
+args_type:
+	mov	-0x20(%rbp), %rax
+	mov	-0x30(%rbp), %rdi
+	mov	(%rax, %rdi, 8), %rdi
+#ifdef __PIC__
+	call	variable_get_type@PLT
+#else
+	call	variable_get_type
+#endif
+	cmp	VT_NULL, %rax
+	je	args_done
+	/* FIXME make sure it is unsigned */
+	cmp	VT_UINT64, %rax
+	jle	args_integer
+	jmp	args_error
 args_integer:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi
