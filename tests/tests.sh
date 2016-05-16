@@ -97,7 +97,7 @@ target="$1"
 
 [ "$clean" -ne 0 ]			&& exit 0
 
-tests="includes"
+tests="includes pkgconfig.sh"
 failures="call0 callf calln"
 case "$(uname -s)-$(uname -m)" in
 	*-amd64|*-x86_64)
