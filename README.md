@@ -7,7 +7,7 @@ About libMarshall
 libMarshall is a marshalling library, allowing the execution of function calls
 of any prototype across a number of combinations of Operating Systems. hardware
 architectures and calling conventions. It is notably used by libApp, a
-message-passing framework at the core of the DeforaOS Project..
+message-passing framework at the core of the DeforaOS Project.
 
 Dependencies for libMarshall
 ----------------------------
