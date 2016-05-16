@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+includedir=${prefix}/include
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+
+Name: @PACKAGE@
+Description: DeforaOS System Marshalling library
+Version: @VERSION@
+Requires: libSystem
+Cflags: -I${includedir}
+Libs: @RPATH@ -L${libdir} -lMarshall
