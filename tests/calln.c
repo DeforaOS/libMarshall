@@ -42,14 +42,14 @@
 
 /* private */
 /* prototypes */
-static void _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
+static int32_t _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
 		int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7,
 		int32_t arg8, int32_t arg9);
 
 
 /* functions */
 /* calln */
-static void _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
+static int32_t _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
 		int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7,
 		int32_t arg8, int32_t arg9)
 {
@@ -72,6 +72,7 @@ static void _calln(int32_t count, int32_t arg1, int32_t arg2, int32_t arg3,
 		fprintf(stderr, "%d: %d\n", count, arg8);
 	if(count >= 9)
 		fprintf(stderr, "%d: %d\n", count, arg9);
+	return count;
 }
 
 
@@ -85,9 +86,15 @@ int main(void)
 	const size_t count = 10;
 	Variable ** args;
 	int32_t i32;
+	Variable * res;
 
-	if((args = malloc(sizeof(*args) * count)) == NULL)
+	if((res = variable_new(VT_INT32, 0)) == NULL)
 		return 2;
+	if((args = malloc(sizeof(*args) * count)) == NULL)
+	{
+		variable_delete(res);
+		return 2;
+	}
 	for(i = 0; i < count; i++)
 	{
 		i32 = i * 1111;
@@ -99,13 +106,17 @@ int main(void)
 		i32 = i;
 		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
 			ret = i + 4;
-		else if(marshall_call(NULL, (MarshallCallback)_calln, i + 1,
+		else if(marshall_call(res, (MarshallCallback)_calln, i + 1,
 					args) != 0)
+			ret = i + 4;
+		else if(variable_get_as(res, VT_INT32, &i32) != 0
+				|| i32 != (int32_t)i)
 			ret = i + 4;
 	}
 	for(i = 0; i < count; i++)
 		if(args[i] != NULL)
 			variable_delete(args[i]);
+	variable_delete(res);
 	free(args);
 	return ret;
 }
