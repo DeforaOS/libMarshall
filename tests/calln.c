@@ -88,7 +88,8 @@ int main(void)
 	int32_t i32;
 	Variable * res;
 
-	if((res = variable_new(VT_INT32, 0)) == NULL)
+	i32 = 0;
+	if((res = variable_new(VT_INT32, &i32)) == NULL)
 		return 2;
 	if((args = malloc(sizeof(*args) * count)) == NULL)
 	{
