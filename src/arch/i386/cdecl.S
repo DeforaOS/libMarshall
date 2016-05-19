@@ -35,9 +35,10 @@
 marshall_call:
 	push	%ebp
 	mov	%esp, %ebp
-	sub	$0xc, %esp			/* VariableType type */
+	sub	$0x10, %esp			/* VariableType type */
 						/* uint64_t res */
 	movl	$0x0, -0x4(%ebp)		/* type = 0 */
+	movl	$0x0, -0xc(%ebp)		/* args_pos = 0 */
 type:
 	/* get the return type */
 	cmpl	NULL, 0x8(%ebp)
@@ -48,8 +49,12 @@ type:
 	add	$0x4, %esp
 type_done:
 args:
-	cmpl	$0x0, 0x10(%ebp)		/* XXX size_t */
-	je	args_done
+	mov	-0xc(%ebp), %eax
+	mov	0x10(%ebp), %edx
+	cmpl	%eax, %edx			/* if(args_pos == args_cnt) */
+	je	args_done			/*	goto args_done */
+	jg	error				/* else if(args_pos > args_cnt)
+							goto error */
 	/* FIXME implement arguments */
 	jmp	error
 args_done:
