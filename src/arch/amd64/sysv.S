@@ -83,10 +83,12 @@ args_type:
 	cmp	VT_NULL, %rax
 	je	args_done
 	/* FIXME make sure it is unsigned */
-	cmp	VT_UINT64, %rax
+	cmpq	VT_UINT64, %rax
 	jle	args_INTEGER
-	cmp	VT_DOUBLE, %rax
+	cmpq	VT_DOUBLE, %rax
 	jle	args_SSE
+	cmpq	VT_STRING, %rax
+	je	args_INTEGER
 	jmp	args_error
 args_INTEGER:
 	mov	-0x20(%rbp), %rdx
