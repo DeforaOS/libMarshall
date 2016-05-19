@@ -35,33 +35,70 @@
 marshall_call:
 	push	%ebp
 	mov	%esp, %ebp
-	sub	$0x10, %esp			/* VariableType type */
+	sub	$0x14, %esp			/* VariableType type */
 						/* uint64_t res */
 	movl	$0x0, -0x4(%ebp)		/* type = 0 */
 	movl	$0x0, -0xc(%ebp)		/* args_pos = 0 */
+	movl	$0x0, -0x10(%ebp)		/* offset = 0 */
 type:
 	/* get the return type */
 	cmpl	NULL, 0x8(%ebp)
 	je	type_done
 	pushl	0x8(%ebp)
-	call	variable_get_type
-	mov	%eax, -0x4(%ebp)
+	call	variable_get_type		/* variable_get_type(res) */
 	add	$0x4, %esp
+	mov	%eax, -0x4(%ebp)
 type_done:
 args:
 	mov	-0xc(%ebp), %eax
 	mov	0x10(%ebp), %edx
 	cmpl	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	args_done			/*	goto args_done */
-	jg	error				/* else if(args_pos > args_cnt)
+	jg	args_error			/* else if(args_pos > args_cnt)
 							goto error */
-	/* FIXME implement arguments */
+args_type:
+	movl	0x14(%ebp), %eax		/* eax = args */
+	movl	-0xc(%ebp), %edx		/* edx = args_pos */
+	movl	(%eax, %edx, 4), %eax		/* eax = args[args_pos] */
+	push	%eax
+	call	variable_get_type		/* variable_get_type(eax) */
+	add	$0x4, %esp
+	cmpl	VT_NULL, %eax
+	je	args_done
+	cmpl	VT_UINT32, %eax
+	jle	args_INTEGER
+	cmpl	VT_STRING, %eax
+	jle	args_INTEGER
+	/* FIXME implement more types */
+	jmp	args_error
+args_INTEGER:
+	lea	-0x8(%ebp), %edx
+	push	%edx
+	push	%eax
+	movl	0x14(%ebp), %eax		/* eax = args */
+	movl	-0xc(%ebp), %edx		/* edx = args_pos */
+	movl	(%eax, %edx, 4), %eax		/* eax = args[args_pos] */
+	push	%eax
+	call	variable_get_as			/* variable_get_as() */
+	add	$0xc, %esp
+	cmp	$0x0, %eax
+	jne	args_error
+	/* FIXME push in reverse order instead */
+	push	-0x8(%ebp)
+	addl	$0x4, -0x10(%ebp)		/* offset += 4 */
+	jmp	args_loop
+args_loop:
+	incl	-0xc(%ebp)			/* args_pos++ */
+	jmp	args
+args_error:
+	addl	-0x10(%ebp), %esp		/* esp += offset */
 	jmp	error
 args_done:
 call:
 	/* call the function */
 	mov	0xc(%ebp), %eax
 	call	*%eax
+	add	-0x10(%ebp), %esp
 call_done:
 return:
 	/* report the value returned */
