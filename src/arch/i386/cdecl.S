@@ -57,10 +57,9 @@ args:
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto error */
 args_type:
-	movl	0x14(%ebp), %eax		/* eax = args */
-	movl	-0xc(%ebp), %edx		/* edx = args_pos */
-	movl	(%eax, %edx, 4), %eax		/* eax = args[args_pos] */
-	push	%eax
+	mov	0x14(%ebp), %eax		/* eax = args */
+	mov	-0xc(%ebp), %edx		/* edx = args_pos */
+	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
 	call	variable_get_type		/* variable_get_type(eax) */
 	add	$0x4, %esp
 	cmp	VT_NULL, %eax
@@ -75,10 +74,9 @@ args_INTEGER:
 	lea	-0x8(%ebp), %edx
 	push	%edx
 	push	%eax
-	movl	0x14(%ebp), %eax		/* eax = args */
-	movl	-0xc(%ebp), %edx		/* edx = args_pos */
-	movl	(%eax, %edx, 4), %eax		/* eax = args[args_pos] */
-	push	%eax
+	mov	0x14(%ebp), %eax		/* eax = args */
+	mov	-0xc(%ebp), %edx		/* edx = args_pos */
+	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
 	call	variable_get_as			/* variable_get_as() */
 	add	$0xc, %esp
 	cmp	$0x0, %eax
