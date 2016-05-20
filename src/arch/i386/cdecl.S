@@ -52,7 +52,7 @@ type_done:
 args:
 	mov	-0xc(%ebp), %eax
 	mov	0x10(%ebp), %edx
-	cmpl	%eax, %edx			/* if(args_pos == args_cnt) */
+	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	args_done			/*	goto args_done */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto error */
@@ -63,11 +63,11 @@ args_type:
 	push	%eax
 	call	variable_get_type		/* variable_get_type(eax) */
 	add	$0x4, %esp
-	cmpl	VT_NULL, %eax
+	cmp	VT_NULL, %eax
 	je	args_done
-	cmpl	VT_UINT32, %eax
+	cmp	VT_UINT32, %eax
 	jle	args_INTEGER
-	cmpl	VT_STRING, %eax
+	cmp	VT_STRING, %eax
 	jle	args_INTEGER
 	/* FIXME implement more types */
 	jmp	args_error
