@@ -78,6 +78,7 @@ args_INTEGER:
 	mov	-0xc(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
 	call	variable_get_as			/* variable_get_as() */
+						/* XXX memory leak */
 	add	$0xc, %esp
 	cmp	$0x0, %eax
 	jne	args_error
@@ -120,7 +121,7 @@ return:
 	je	return_INTEGER64
 	cmpl	VT_UINT64, -0x4(%ebp)
 	je	return_INTEGER64
-	cmpl	VT_STRING, -0x4(%ebp)
+	cmpl	VT_STRING, -0x4(%ebp)		/* XXX free the result */
 	je	return_POINTER
 	jmp	error
 return_NULL:
