@@ -35,7 +35,7 @@
 marshall_call:
 	push	%ebp
 	mov	%esp, %ebp
-	sub	$0x14, %esp			/* VariableType type */
+	sub	$0x18, %esp			/* VariableType type */
 						/* uint64_t res */
 	movl	$0x0, -0x4(%ebp)		/* type = 0 */
 	movl	$0x0, -0xc(%ebp)		/* args_pos = 0 */
