@@ -122,22 +122,8 @@ return:
 	/* report the value returned */
 	cmpl	VT_NULL, -0x4(%ebp)
 	je	return_NULL
-	cmpl	VT_BOOL, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_INT8, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_UINT8, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_INT16, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_UINT16, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_INT32, -0x4(%ebp)
-	je	return_INTEGER
 	cmpl	VT_UINT32, -0x4(%ebp)
-	je	return_INTEGER
-	cmpl	VT_INT64, -0x4(%ebp)
-	je	return_INTEGER64
+	jle	return_INTEGER
 	cmpl	VT_UINT64, -0x4(%ebp)
 	jle	return_INTEGER64
 	cmpl	VT_DOUBLE, -0x4(%ebp)
