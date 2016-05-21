@@ -77,7 +77,7 @@ int main(void)
 	double d = 0.0;
 
 	/* VT_FLOAT */
-	if((res = variable_new(VT_FLOAT, &d)) == NULL)
+	if((res = variable_new(VT_FLOAT, &f)) == NULL)
 		return 2;
 	if((ret = marshall_call(res, (MarshallCallback)_callf_float, 0, NULL))
 			== 0)
