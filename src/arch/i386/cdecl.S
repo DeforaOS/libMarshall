@@ -50,8 +50,8 @@ type:
 	mov	%eax, -0x4(%ebp)
 type_done:
 args:
-	mov	-0xc(%ebp), %eax
-	mov	0x10(%ebp), %edx
+	mov	0x10(%ebp), %eax
+	mov	-0xc(%ebp), %edx
 	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	args_done			/*	goto args_done */
 	jg	args_error			/* else if(args_pos > args_cnt)
