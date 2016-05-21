@@ -66,6 +66,11 @@ args_type:
 	je	args_done
 	cmp	VT_UINT32, %eax
 	jle	args_INTEGER
+	cmp	VT_UINT64, %eax
+	/* FIXME implement */
+	jle	args_error
+	cmp	VT_DOUBLE, %eax
+	jle	args_DOUBLE
 	cmp	VT_STRING, %eax
 	jle	args_INTEGER
 	/* FIXME implement more types */
@@ -85,6 +90,20 @@ args_INTEGER:
 	/* FIXME push in reverse order instead */
 	push	-0x8(%ebp)
 	addl	$0x4, -0x10(%ebp)		/* offset += 4 */
+	jmp	args_loop
+args_DOUBLE:
+	lea	-0xc(%ebp), %edx
+	push	%edx
+	push	%eax
+	mov	0x14(%ebp), %eax		/* eax = args */
+	mov	-0xc(%ebp), %edx		/* edx = args_pos */
+	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
+	call	variable_get_as			/* variable_get_as() */
+						/* XXX memory leak */
+	add	$0xc, %esp
+	cmp	$0x0, %eax
+	jne	args_error
+	fld	-0xc(%ebp)
 	jmp	args_loop
 args_loop:
 	incl	-0xc(%ebp)			/* args_pos++ */
@@ -120,7 +139,9 @@ return:
 	cmpl	VT_INT64, -0x4(%ebp)
 	je	return_INTEGER64
 	cmpl	VT_UINT64, -0x4(%ebp)
-	je	return_INTEGER64
+	jle	return_INTEGER64
+	cmpl	VT_DOUBLE, -0x4(%ebp)
+	jle	return_DOUBLE
 	cmpl	VT_STRING, -0x4(%ebp)		/* XXX free the result */
 	je	return_POINTER
 	jmp	error
@@ -140,6 +161,13 @@ return_INTEGER64:
 	push	%eax
 	pushl	-0x4(%ebp)			/* VariableType type */
 	pushl	0x8(%ebp)			/* Variable * ret */
+	jmp	return_variable_set_from
+return_DOUBLE:
+	fst	-0xc(%ebp)
+	lea	-0xc(%ebp), %eax
+	push	%eax
+	pushl	-0x4(%ebp)			/* VariableType type */
+	push	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
 return_POINTER:
 	push	%eax				/* void * value */
