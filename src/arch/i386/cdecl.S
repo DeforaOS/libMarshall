@@ -55,7 +55,7 @@ args:
 	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	args_done			/*	goto args_done */
 	jg	args_error			/* else if(args_pos > args_cnt)
-							goto error */
+							goto args_error */
 args_type:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0xc(%ebp), %edx		/* edx = args_pos */
