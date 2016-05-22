@@ -41,27 +41,31 @@
 
 /* private */
 /* prototypes */
-static double _callf_double(void);
-static float _callf_float(void);
+static double _callf_double(double d);
+static float _callf_float(float f);
 
 
 /* functions */
 /* callf_double */
-static double _callf_double(void)
+static double _callf_double(double d)
 {
-	double ret = M_PI;
+	double ret = M_PI - 1.0;
 
-	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s(%f) => %f\n", PROGNAME, __func__, d, ret);
+	if(d != 1.0)
+		return -1.0;
 	return ret;
 }
 
 
 /* callf_float */
-static float _callf_float(void)
+static float _callf_float(float f)
 {
-	float ret = M_PI;
+	float ret = M_PI - 1.0;
 
-	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s(%f) => %f\n", PROGNAME, __func__, f, ret);
+	if(f != 1.0)
+		return -1.0;
 	return ret;
 }
 
@@ -73,30 +77,30 @@ int main(void)
 {
 	int ret;
 	Variable * res;
-	float f = 0.0;
-	double d = 0.0;
+	float f = 1.0;
+	double d = 1.0;
 
 	/* VT_FLOAT */
 	if((res = variable_new(VT_FLOAT, &f)) == NULL)
 		return 2;
-	if((ret = marshall_call(res, (MarshallCallback)_callf_float, 0, NULL))
+	if((ret = marshall_call(res, (MarshallCallback)_callf_float, 1, &res))
 			== 0)
 		ret = variable_get_as(res, VT_FLOAT, &f);
 	variable_delete(res);
 	if(ret != 0)
 		return 3;
-	if(f != (float)M_PI)
+	if(f + 1.0 != (float)M_PI)
 		return 4;
 	/* VT_DOUBLE */
 	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
 		return 5;
-	if((ret = marshall_call(res, (MarshallCallback)_callf_double, 0, NULL))
+	if((ret = marshall_call(res, (MarshallCallback)_callf_double, 1, &res))
 			== 0)
 		ret = variable_get_as(res, VT_DOUBLE, &d);
 	variable_delete(res);
 	if(ret != 0)
 		return 6;
-	if(d != M_PI)
+	if(d + 1.0 != M_PI)
 		return 7;
 	return 0;
 }
