@@ -69,6 +69,8 @@ args_type:
 	cmp	VT_UINT64, %eax
 	/* FIXME implement */
 	jle	args_error
+	cmp	VT_FLOAT, %eax
+	jle	args_FLOAT
 	cmp	VT_DOUBLE, %eax
 	jle	args_DOUBLE
 	cmp	VT_STRING, %eax
@@ -90,6 +92,20 @@ args_INTEGER:
 	/* FIXME push in reverse order instead */
 	push	-0x8(%ebp)
 	addl	$0x4, -0x10(%ebp)		/* offset += 4 */
+	jmp	args_loop
+args_FLOAT:
+	lea	-0xc(%ebp), %edx
+	push	%edx
+	push	%eax
+	mov	0x14(%ebp), %eax		/* eax = args */
+	mov	-0xc(%ebp), %edx		/* edx = args_pos */
+	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
+	call	variable_get_as			/* variable_get_as() */
+						/* XXX memory leak */
+	add	$0xc, %esp
+	cmp	$0x0, %eax
+	jne	args_error
+	flds	-0xc(%ebp)
 	jmp	args_loop
 args_DOUBLE:
 	lea	-0xc(%ebp), %edx
