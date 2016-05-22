@@ -126,6 +126,8 @@ return:
 	jle	return_INTEGER
 	cmpl	VT_UINT64, -0x4(%ebp)
 	jle	return_INTEGER64
+	cmpl	VT_FLOAT, -0x4(%ebp)
+	jle	return_FLOAT
 	cmpl	VT_DOUBLE, -0x4(%ebp)
 	jle	return_DOUBLE
 	cmpl	VT_STRING, -0x4(%ebp)		/* XXX free the result */
@@ -148,8 +150,15 @@ return_INTEGER64:
 	pushl	-0x4(%ebp)			/* VariableType type */
 	pushl	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
+return_FLOAT:
+	fsts	-0xc(%ebp)
+	lea	-0xc(%ebp), %eax
+	push	%eax
+	pushl	-0x4(%ebp)			/* VariableType type */
+	push	0x8(%ebp)			/* Variable * ret */
+	jmp	return_variable_set_from
 return_DOUBLE:
-	fst	-0xc(%ebp)
+	fstl	-0xc(%ebp)
 	lea	-0xc(%ebp), %eax
 	push	%eax
 	pushl	-0x4(%ebp)			/* VariableType type */
