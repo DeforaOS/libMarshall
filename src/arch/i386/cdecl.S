@@ -103,7 +103,7 @@ args_DOUBLE:
 	add	$0xc, %esp
 	cmp	$0x0, %eax
 	jne	args_error
-	fld	-0xc(%ebp)
+	fldl	-0xc(%ebp)
 	jmp	args_loop
 args_loop:
 	incl	-0xc(%ebp)			/* args_pos++ */
