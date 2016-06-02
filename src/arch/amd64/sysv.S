@@ -206,10 +206,14 @@ args_SSE_more:
 	push	-0x78(%rbp)			/* stack */
 	push	-0x80(%rbp)
 	addq	$0x10, -0x68(%rbp)		/* offset += 16 */
+#if 0 /* fallback */
 	jmp	args_SSE_loop
+#endif
 args_SSE_loop:
 	incq	-0x88(%rbp)			/* args_cnt_sse++ */
+#if 0 /* fallback */
 	jmp	args_loop
+#endif
 args_loop:
 	incq	-0x30(%rbp)			/* args_pos++ */
 	jmp	args
@@ -253,7 +257,9 @@ return_POINTER:
 return_SSE:
 	movaps	%xmm0, -0x80(%rbp)
 	lea	-0x80(%rbp), %rdx
+#if 0 /* fallback */
 	jmp	return_variable_set_from
+#endif
 return_variable_set_from:
 	mov	-0x08(%rbp), %rdi
 	mov	-0x28(%rbp), %rsi
