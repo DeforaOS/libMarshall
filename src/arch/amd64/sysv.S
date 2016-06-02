@@ -244,14 +244,10 @@ return:
 return_NULL:
 	jmp	return_done
 return_INTEGER:
-	mov	-0x08(%rbp), %rdi
-	mov	-0x28(%rbp), %rsi
-	mov	%rax, -0x78(%rbp)
-	lea	-0x78(%rbp), %rdx
+	mov	%rax, -0x80(%rbp)
+	lea	-0x80(%rbp), %rdx
 	jmp	return_variable_set_from
 return_POINTER:
-	mov	-0x08(%rbp), %rdi
-	mov	-0x28(%rbp), %rsi
 	mov	%rax, %rdx
 	jmp	return_variable_set_from
 return_SSE:
@@ -259,6 +255,8 @@ return_SSE:
 	lea	-0x80(%rbp), %rdx
 	jmp	return_variable_set_from
 return_variable_set_from:
+	mov	-0x08(%rbp), %rdi
+	mov	-0x28(%rbp), %rsi
 #ifdef __PIC__					/* variable_set_from() */
 	call	variable_set_from@PLT
 #else
