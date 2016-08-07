@@ -53,6 +53,7 @@ marshall_call:
 	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x88(%rbp)		/* size_t args_cnt_sse */
+	movq	$0x0, -0x90(%rbp)		/* size_t pos */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
@@ -124,8 +125,10 @@ count_loop:
 count_error:
 	jmp	error
 count_done:
-	movq	$0x0, -0x30(%rbp)		/* args_pos = 0 */
 	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
+	movq	$0x0, -0x70(%rbp)		/* args_cnt_integer = 0 */
+	movq	$0x0, -0x88(%rbp)		/* args_cnt_sse = 0 */
+	movq	$0x0, -0x30(%rbp)		/* args_pos = 0 */
 args:
 	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
 	mov	-0x18(%rbp), %rdx
@@ -200,8 +203,13 @@ args_INTEGER_5:
 	mov	%rax, -0x60(%rbp)		/* r9 */
 	jmp	args_INTEGER_loop
 args_INTEGER_more:
-	/* FIXME copy in reverse order instead */
+	mov	%rsp, %rdx			/* rdx = %rsp + pos */
+	addq	-0x90(%rbp), %rdx
+	mov	%rax, (%rdx)			/* *rdx = rax */
+	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
+#if 0 /* fallback */
 	jmp	args_INTEGER_loop
+#endif
 args_INTEGER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	args_loop
@@ -262,7 +270,8 @@ args_SSE_7:
 	movaps	-0x80(%rbp), %xmm7
 	jmp	args_SSE_loop
 args_SSE_more:
-	/* FIXME copy in reverse order instead */
+	addq	$0x10, -0x90(%rbp)		/* pos += 16 */
+	/* FIXME copy on the stack */
 #if 0 /* fallback */
 	jmp	args_SSE_loop
 #endif
