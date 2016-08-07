@@ -64,6 +64,163 @@ type:
 #endif
 	mov	%rax, -0x28(%rbp)
 type_done:
+count:
+	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
+	mov	-0x18(%rbp), %rdx
+	cmp	%rdx, %rdi
+	je	count_done			/* 	goto count_done */
+	jg	count_error			/* else if(args_pos > args_cnt)
+							goto count_error */
+count_type:
+	mov	-0x20(%rbp), %rax
+	mov	-0x30(%rbp), %rdi
+	mov	(%rax, %rdi, 8), %rdi
+#ifdef __PIC__
+	call	variable_get_type@PLT
+#else
+	call	variable_get_type
+#endif
+	cmp	VT_NULL, %rax
+	je	count_done
+	/* FIXME make sure it is unsigned */
+	cmpq	VT_UINT64, %rax
+	jle	count_INTEGER
+	cmpq	VT_DOUBLE, %rax
+	jle	count_SSE
+	cmpq	VT_STRING, %rax
+	je	count_INTEGER
+	jmp	count_error
+count_INTEGER:
+	mov	-0x20(%rbp), %rdx
+	mov	-0x30(%rbp), %rdi
+	mov	(%rdx, %rdi, 8), %rdi
+	mov	%rax, %rsi
+	lea	-0x78(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	count_error			/*	goto count_error */
+	mov	-0x78(%rbp), %rax
+	cmpq	$0x0, -0x70(%rbp)
+	je	count_INTEGER_0
+	cmpq	$0x1, -0x70(%rbp)
+	je	count_INTEGER_1
+	cmpq	$0x2, -0x70(%rbp)
+	je	count_INTEGER_2
+	cmpq	$0x3, -0x70(%rbp)
+	je	count_INTEGER_3
+	cmpq	$0x4, -0x70(%rbp)
+	je	count_INTEGER_4
+	cmpq	$0x5, -0x70(%rbp)
+	je	count_INTEGER_5
+	cmpq	$0x6, -0x70(%rbp)
+	jge	count_INTEGER_more
+	jmp	error
+count_INTEGER_0:
+	mov	%rax, -0x38(%rbp)		/* rdi */
+	jmp	count_INTEGER_loop
+count_INTEGER_1:
+	mov	%rax, -0x40(%rbp)		/* rsi */
+	jmp	count_INTEGER_loop
+count_INTEGER_2:
+	mov	%rax, -0x48(%rbp)		/* rdx */
+	jmp	count_INTEGER_loop
+count_INTEGER_3:
+	mov	%rax, -0x50(%rbp)		/* rcx */
+	jmp	count_INTEGER_loop
+count_INTEGER_4:
+	mov	%rax, -0x58(%rbp)		/* r8 */
+	jmp	count_INTEGER_loop
+count_INTEGER_5:
+	mov	%rax, -0x60(%rbp)		/* r9 */
+	jmp	count_INTEGER_loop
+count_INTEGER_more:
+	/* FIXME push in reverse order instead */
+	push	%rax				/* stack */
+	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	jmp	count_INTEGER_loop
+count_INTEGER_loop:
+	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	jmp	count_loop
+count_SSE:
+	mov	-0x20(%rbp), %rdx
+	mov	-0x30(%rbp), %rdi
+	mov	(%rdx, %rdi, 8), %rdi
+	mov	%rax, %rsi
+	lea	-0x80(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	count_error			/*	goto count_error */
+	cmpq	$0x0, -0x88(%rbp)
+	je	count_SSE_0
+	cmpq	$0x1, -0x88(%rbp)
+	je	count_SSE_1
+	cmpq	$0x2, -0x88(%rbp)
+	je	count_SSE_2
+	cmpq	$0x3, -0x88(%rbp)
+	je	count_SSE_3
+	cmpq	$0x4, -0x88(%rbp)
+	je	count_SSE_4
+	cmpq	$0x5, -0x88(%rbp)
+	je	count_SSE_5
+	cmpq	$0x6, -0x88(%rbp)
+	je	count_SSE_6
+	cmpq	$0x7, -0x88(%rbp)
+	je	count_SSE_7
+	cmpq	$0x8, -0x88(%rbp)
+	jge	count_SSE_more
+	jmp	error
+count_SSE_0:
+	movaps	-0x80(%rbp), %xmm0
+	jmp	count_SSE_loop
+count_SSE_1:
+	movaps	-0x80(%rbp), %xmm1
+	jmp	count_SSE_loop
+count_SSE_2:
+	movaps	-0x80(%rbp), %xmm2
+	jmp	count_SSE_loop
+count_SSE_3:
+	movaps	-0x80(%rbp), %xmm3
+	jmp	count_SSE_loop
+count_SSE_4:
+	movaps	-0x80(%rbp), %xmm4
+	jmp	count_SSE_loop
+count_SSE_5:
+	movaps	-0x80(%rbp), %xmm5
+	jmp	count_SSE_loop
+count_SSE_6:
+	movaps	-0x80(%rbp), %xmm6
+	jmp	count_SSE_loop
+count_SSE_7:
+	movaps	-0x80(%rbp), %xmm7
+	jmp	count_SSE_loop
+count_SSE_more:
+	/* FIXME push in reverse order instead */
+	push	-0x78(%rbp)			/* stack */
+	push	-0x80(%rbp)
+	addq	$0x10, -0x68(%rbp)		/* offset += 16 */
+#if 0 /* fallback */
+	jmp	count_SSE_loop
+#endif
+count_SSE_loop:
+	incq	-0x88(%rbp)			/* args_cnt_sse++ */
+#if 0 /* fallback */
+	jmp	count_loop
+#endif
+count_loop:
+	incq	-0x30(%rbp)			/* args_pos++ */
+	jmp	count
+count_error:
+	addq	-0x68(%rbp), %rsp		/* rsp += offset */
+	jmp	error
+count_done:
 args:
 	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
 	mov	-0x18(%rbp), %rdx
