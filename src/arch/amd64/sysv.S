@@ -270,8 +270,14 @@ args_SSE_7:
 	movaps	-0x80(%rbp), %xmm7
 	jmp	args_SSE_loop
 args_SSE_more:
+	mov	%rsp, %rdx			/* rdx = %rsp + pos */
+	addq	-0x90(%rbp), %rdx
+	movq	-0x80(%rbp), %rcx		/* *rdx = low(sse) */
+	mov	%rcx, (%rdx)
+	addq	$0x8, %rdx			/* rdx += 8 */
+	movq	-0x78(%rbp), %rcx		/* *rdx = high(sse) */
+	mov	%rcx, (%rdx)
 	addq	$0x10, -0x90(%rbp)		/* pos += 16 */
-	/* FIXME copy on the stack */
 #if 0 /* fallback */
 	jmp	args_SSE_loop
 #endif
