@@ -100,15 +100,15 @@ target="$1"
 [ "$clean" -ne 0 ]			&& exit 0
 
 tests="includes pkgconfig.sh"
-failures="call0 callf calln calls"
+failures="call0 callf callfn calln calls"
 case "$(uname -s)-$(uname -m)" in
 	*-amd64|*-x86_64)
 		tests="$tests call0 callf calln calls"
-		failures=""
+		failures="callfn"
 		;;
 	*-i386)
 		tests="$tests call0 calls"
-		failures="callf calln"
+		failures="callf callfn calln"
 		;;
 esac
 
