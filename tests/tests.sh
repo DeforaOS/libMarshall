@@ -107,8 +107,8 @@ case "$(uname -s)-$(uname -m)" in
 		failures="callfn"
 		;;
 	*-i386)
-		tests="$tests call0 calls"
-		failures="callf callfn calln"
+		tests="$tests call0 calln calls"
+		failures="callf callfn"
 		;;
 esac
 
