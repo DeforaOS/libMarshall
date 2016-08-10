@@ -40,6 +40,7 @@ marshall_call:
 	movl	$0x0, -0x4(%ebp)		/* type = 0 */
 	movl	$0x0, -0xc(%ebp)		/* args_pos = 0 */
 	movl	$0x0, -0x10(%ebp)		/* offset = 0 */
+	movl	$0x0, -0x14(%ebp)		/* pos = 0 */
 type:
 	/* get the return type */
 	cmpl	NULL, 0x8(%ebp)
@@ -49,6 +50,55 @@ type:
 	add	$0x4, %esp
 	mov	%eax, -0x4(%ebp)
 type_done:
+count:
+	mov	0x10(%ebp), %eax
+	mov	-0xc(%ebp), %edx
+	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
+	je	count_done			/*	goto count_done */
+	jg	count_error			/* else if(args_pos > args_cnt)
+							goto count_error */
+count_type:
+	mov	0x14(%ebp), %eax		/* eax = args */
+	mov	-0xc(%ebp), %edx		/* edx = args_pos */
+	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
+	call	variable_get_type		/* variable_get_type(eax) */
+	add	$0x4, %esp
+	cmp	VT_NULL, %eax
+	je	count_done
+	cmp	VT_UINT32, %eax
+	jle	count_INTEGER
+	cmp	VT_UINT64, %eax
+	/* FIXME implement */
+	jle	count_error
+	cmp	VT_FLOAT, %eax
+	jle	count_FLOAT
+	cmp	VT_DOUBLE, %eax
+	jle	count_DOUBLE
+	cmp	VT_STRING, %eax
+	jle	count_INTEGER
+	/* FIXME implement more types */
+	jmp	count_error
+count_INTEGER:
+	addl	$0x4, -0x10(%ebp)		/* offset += 4 */
+#if 0 /* fallback */
+	jmp	count_loop
+#endif
+count_FLOAT:
+#if 0 /* fallback */
+	jmp	count_loop
+#endif
+count_DOUBLE:
+#if 0 /* fallback */
+	jmp	count_loop
+#endif
+count_loop:
+	incl	-0xc(%ebp)			/* args_pos++ */
+	jmp	count
+count_error:
+	jmp	error
+count_done:
+	subl	-0x10(%ebp), %esp		/* esp -= offset */
+	movl	$0x0, -0xc(%ebp)		/* args_pos = 0 */
 args:
 	mov	0x10(%ebp), %eax
 	mov	-0xc(%ebp), %edx
@@ -84,14 +134,16 @@ args_INTEGER:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0xc(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* variable_get_as() */
+	call	variable_get_as			/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
-	cmp	$0x0, %eax
-	jne	args_error
-	/* FIXME push in reverse order instead */
-	push	-0x8(%ebp)
-	addl	$0x4, -0x10(%ebp)		/* offset += 4 */
+	cmp	$0x0, %eax			/* if(eax != 0) */
+	jne	args_error			/*	goto args_error */
+	mov	%esp, %edx			/* edx = esp + pos */
+	addl	-0x14(%ebp), %edx
+	mov	-0x8(%ebp), %eax		/* *edx = res */
+	mov	%eax, (%edx)
+	addl	$0x4, -0x14(%ebp)		/* pos += 4 */
 	jmp	args_loop
 args_FLOAT:
 	lea	-0xc(%ebp), %edx
@@ -100,11 +152,11 @@ args_FLOAT:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0xc(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* variable_get_as() */
+	call	variable_get_as			/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
-	cmp	$0x0, %eax
-	jne	args_error
+	cmp	$0x0, %eax			/* if(eax != 0) */
+	jne	args_error			/*	goto args_error */
 	flds	-0xc(%ebp)
 	jmp	args_loop
 args_DOUBLE:
@@ -114,13 +166,15 @@ args_DOUBLE:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0xc(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* variable_get_as() */
+	call	variable_get_as			/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
-	cmp	$0x0, %eax
-	jne	args_error
+	cmp	$0x0, %eax			/* if(eax != 0) */
+	jne	args_error			/*	goto args_error */
 	fldl	-0xc(%ebp)
+#if 0 /* fallback */
 	jmp	args_loop
+#endif
 args_loop:
 	incl	-0xc(%ebp)			/* args_pos++ */
 	jmp	args
@@ -132,7 +186,7 @@ call:
 	/* call the function */
 	mov	0xc(%ebp), %eax
 	call	*%eax
-	add	-0x10(%ebp), %esp
+	add	-0x10(%ebp), %esp		/* esp += offset */
 call_done:
 return:
 	/* report the value returned */
