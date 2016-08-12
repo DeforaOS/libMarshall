@@ -97,7 +97,7 @@ int main(void)
 {
 	int ret = 0;
 	size_t i;
-	const size_t count = 12;
+	const size_t count = 13;
 	Variable ** args;
 	int32_t i32;
 	double d;
