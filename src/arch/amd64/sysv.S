@@ -181,8 +181,7 @@ args_INTEGER:
 	je	args_INTEGER_4
 	cmpq	$0x5, -0x70(%rbp)
 	je	args_INTEGER_5
-	cmpq	$0x6, -0x70(%rbp)
-	jge	args_INTEGER_more
+	jg	args_INTEGER_more
 	jmp	error
 args_INTEGER_0:
 	mov	%rax, -0x38(%rbp)		/* rdi */
@@ -242,8 +241,7 @@ args_SSE:
 	je	args_SSE_6
 	cmpq	$0x7, -0x88(%rbp)
 	je	args_SSE_7
-	cmpq	$0x8, -0x88(%rbp)
-	jge	args_SSE_more
+	jg	args_SSE_more
 	jmp	error
 args_SSE_0:
 	movaps	-0x80(%rbp), %xmm0
