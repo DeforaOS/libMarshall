@@ -112,7 +112,7 @@ count_SSE:
 count_SSE_registers:
 	jmp	count_SSE_loop
 count_SSE_more:
-	addq	$0x10, -0x68(%rbp)		/* offset += 16 */
+	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
 #if 0 /* fallback */
 	jmp	count_SSE_loop
 #endif
@@ -272,12 +272,9 @@ args_SSE_7:
 args_SSE_more:
 	mov	%rsp, %rdx			/* rdx = rsp + pos */
 	addq	-0x90(%rbp), %rdx
-	movq	-0x80(%rbp), %rcx		/* *rdx = low(sse) */
+	mov	-0x80(%rbp), %rcx		/* *rdx = sse */
 	mov	%rcx, (%rdx)
-	addq	$0x8, %rdx			/* rdx += 8 */
-	movq	-0x78(%rbp), %rcx		/* *rdx = high(sse) */
-	mov	%rcx, (%rdx)
-	addq	$0x10, -0x90(%rbp)		/* pos += 16 */
+	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
 #if 0 /* fallback */
 	jmp	args_SSE_loop
 #endif
