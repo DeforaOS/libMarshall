@@ -171,7 +171,8 @@ args_INTEGER64:
 	addl	$0x8, -0x18(%ebp)		/* pos += 8 */
 	jmp	args_loop
 args_FLOAT:
-	lea	-0x10(%ebp), %edx
+	mov	%esp, %edx			/* edx = esp + pos */
+	addl	-0x18(%ebp), %edx
 	push	%edx
 	push	%eax
 	mov	0x14(%ebp), %eax		/* eax = args */
@@ -182,14 +183,11 @@ args_FLOAT:
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
 	jne	args_error			/*	goto args_error */
-	mov	%esp, %edx			/* edx = esp + pos */
-	addl	-0x18(%ebp), %edx
-	mov	-0x10(%ebp), %eax		/* *edx = res */
-	mov	%eax, (%edx)
 	addl	$0x4, -0x18(%ebp)		/* pos += 4 */
 	jmp	args_loop
 args_DOUBLE:
-	lea	-0x10(%ebp), %edx
+	mov	%esp, %edx			/* edx = esp + pos */
+	addl	-0x18(%ebp), %edx
 	push	%edx
 	push	%eax
 	mov	0x14(%ebp), %eax		/* eax = args */
@@ -200,10 +198,6 @@ args_DOUBLE:
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
 	jne	args_error			/*	goto args_error */
-	mov	%esp, %edx			/* edx = esp + pos */
-	addl	-0x18(%ebp), %edx
-	mov	-0x10(%ebp), %eax		/* *edx = res */
-	mov	%eax, (%edx)
 	addl	$0x8, -0x18(%ebp)		/* pos += 8 */
 	jmp	args_loop
 args_POINTER:
