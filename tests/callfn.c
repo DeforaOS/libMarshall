@@ -77,14 +77,15 @@ static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
 
 static int32_t _callfn_check(int32_t count, int32_t pos, float * arg)
 {
-	float f;
+	float flow = 1111.0;
+	float fhigh = 1111.2;
 
 	if(pos <= count)
 	{
 		fprintf(stderr, "%d: %f\n", count, *arg);
-		f = 1111.1;
-		f = f * pos;
-		return (f == (*arg)) ? 0 : 1;
+		flow = flow * pos;
+		fhigh = fhigh * pos;
+		return (flow < (*arg) && fhigh > (*arg)) ? 0 : 1;
 	}
 	return 0;
 }
