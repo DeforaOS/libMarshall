@@ -105,8 +105,10 @@ count_INTEGER_loop:
 	jmp	count_loop
 count_SSE:
 	cmpq	$0x7, -0x88(%rbp)
+	jg	count_SSE_more
+#if 0 /* fallback */
 	jle	count_SSE_registers
-	jmp	count_SSE_more
+#endif
 count_SSE_registers:
 	jmp	count_SSE_loop
 count_SSE_more:
