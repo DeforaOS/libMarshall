@@ -77,12 +77,11 @@ static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
 
 static int32_t _calldn_check(int32_t count, int32_t pos, double * arg)
 {
-	double d;
+	double d = 1111.1;
 
 	if(pos <= count)
 	{
 		fprintf(stderr, "%d: %f\n", count, *arg);
-		d = 1111.1;
 		d = d * pos;
 		return (d == (*arg)) ? 0 : 1;
 	}
