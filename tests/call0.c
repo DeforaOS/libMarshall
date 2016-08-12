@@ -40,12 +40,33 @@
 
 /* private */
 /* prototypes */
+static double _call0_double(void);
+static float _call0_float(void);
 static int32_t _call0_int32(void);
 static int64_t _call0_int64(void);
 static char const * _call0_string(void);
 
 
 /* functions */
+static double _call0_double(void)
+{
+	double ret = 1.234567e89;
+
+	fprintf(stderr, "%s: %s() => 0x%f\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
+/* call0_float */
+static float _call0_float(void)
+{
+	float ret = 1.234e5;
+
+	fprintf(stderr, "%s: %s() => 0x%f\n", PROGNAME, __func__, ret);
+	return ret;
+}
+
+
 /* call0_int32 */
 static int32_t _call0_int32(void)
 {
@@ -85,6 +106,8 @@ int main(void)
 {
 	int ret;
 	Variable * res;
+	double d = -1.0;
+	float f = -1.0;
 	int32_t r32 = -1;
 	int64_t r64 = -1;
 	char * s;
@@ -111,16 +134,38 @@ int main(void)
 		return 6;
 	if(r64 != 0x4142434445464748)
 		return 7;
+	/* VT_DOUBLE */
+	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
+		return 8;
+	if((ret = marshall_call(res, (MarshallCallback)_call0_double, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_DOUBLE, &d);
+	variable_delete(res);
+	if(ret != 0)
+		return 9;
+	if(d != 1.234567e89)
+		return 10;
+	/* VT_FLOAT */
+	if((res = variable_new(VT_FLOAT, &f)) == NULL)
+		return 11;
+	if((ret = marshall_call(res, (MarshallCallback)_call0_float, 0, NULL))
+			== 0)
+		ret = variable_get_as(res, VT_FLOAT, &f);
+	variable_delete(res);
+	if(ret != 0)
+		return 12;
+	if(f != 1.234e5)
+		return 13;
 	/* VT_STRING */
 	if((res = variable_new(VT_STRING, "")) == NULL)
-		return 8;
+		return 14;
 	if((ret = marshall_call(res, (MarshallCallback)_call0_string, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_STRING, &s);
 	variable_delete(res);
 	if(ret != 0)
-		return 9;
+		return 15;
 	if(strcmp(s, "_call0_string") != 0)
-		return 10;
+		return 16;
 	return 0;
 }
