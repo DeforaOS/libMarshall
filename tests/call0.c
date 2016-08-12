@@ -52,7 +52,7 @@ static double _call0_double(void)
 {
 	double ret = 1.234567e89;
 
-	fprintf(stderr, "%s: %s() => 0x%f\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
 	return ret;
 }
 
@@ -62,7 +62,7 @@ static float _call0_float(void)
 {
 	float ret = 1.234e5;
 
-	fprintf(stderr, "%s: %s() => 0x%f\n", PROGNAME, __func__, ret);
+	fprintf(stderr, "%s: %s() => %f\n", PROGNAME, __func__, ret);
 	return ret;
 }
 
