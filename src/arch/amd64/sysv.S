@@ -203,7 +203,7 @@ args_INTEGER_5:
 	mov	%rax, -0x60(%rbp)		/* r9 */
 	jmp	args_INTEGER_loop
 args_INTEGER_more:
-	mov	%rsp, %rdx			/* rdx = %rsp + pos */
+	mov	%rsp, %rdx			/* rdx = rsp + pos */
 	addq	-0x90(%rbp), %rdx
 	mov	%rax, (%rdx)			/* *rdx = rax */
 	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
@@ -270,7 +270,7 @@ args_SSE_7:
 	movaps	-0x80(%rbp), %xmm7
 	jmp	args_SSE_loop
 args_SSE_more:
-	mov	%rsp, %rdx			/* rdx = %rsp + pos */
+	mov	%rsp, %rdx			/* rdx = rsp + pos */
 	addq	-0x90(%rbp), %rdx
 	movq	-0x80(%rbp), %rcx		/* *rdx = low(sse) */
 	mov	%rcx, (%rdx)
