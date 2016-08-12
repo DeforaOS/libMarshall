@@ -103,8 +103,8 @@ tests="includes pkgconfig.sh"
 failures="call0 callf callfn calln calls"
 case "$(uname -s)-$(uname -m)" in
 	*-amd64|*-x86_64)
-		tests="$tests call0 callf calln calls"
-		failures="callfn"
+		tests="$tests call0 callf callfn calln calls"
+		failures=""
 		;;
 	*-i386)
 		tests="$tests call0 calln calls"
