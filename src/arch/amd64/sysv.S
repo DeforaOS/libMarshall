@@ -69,7 +69,7 @@ count:
 	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
 	mov	-0x18(%rbp), %rdx
 	cmp	%rdx, %rdi
-	je	count_done			/* 	goto count_done */
+	je	count_round			/* 	goto count_round */
 	jg	count_error			/* else if(args_pos > args_cnt)
 							goto count_error */
 count_type:
@@ -82,7 +82,7 @@ count_type:
 	call	variable_get_type
 #endif
 	cmp	VT_NULL, %rax
-	je	count_done
+	je	count_round
 	/* FIXME make sure it is unsigned */
 	cmpq	VT_UINT64, %rax
 	jle	count_INTEGER
@@ -126,6 +126,12 @@ count_loop:
 	jmp	count
 count_error:
 	jmp	error
+count_round:
+	mov	-0x68(%rbp), %rax		/* if((offset & 0x8) != 0x0) */
+	and	$0x8, %rax
+	cmp	$0x0, %rax
+	je	count_done
+	addq	$0x8, -0x68(%rbp)		/*	offset += 0x8 */
 count_done:
 	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
 	movq	$0x0, -0x70(%rbp)		/* args_cnt_integer = 0 */
