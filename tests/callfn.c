@@ -44,7 +44,8 @@
 /* prototypes */
 static int32_t _callfn(int32_t count, double arg1, double arg2, double arg3,
 		double arg4, double arg5, double arg6, double arg7,
-		double arg8, double arg9);
+		double arg8, double arg9, double arg10, double arg11,
+		double arg12);
 
 
 /* functions */
@@ -53,7 +54,8 @@ static int32_t _callfn_check(int32_t count, int32_t pos, double * arg);
 
 static int32_t _callfn(int32_t count, double arg1, double arg2, double arg3,
 		double arg4, double arg5, double arg6, double arg7,
-		double arg8, double arg9)
+		double arg8, double arg9, double arg10, double arg11,
+		double arg12)
 {
 	int32_t ret = 0;
 
@@ -67,9 +69,9 @@ static int32_t _callfn(int32_t count, double arg1, double arg2, double arg3,
 	ret |= _callfn_check(count, 7, &arg7);
 	ret |= _callfn_check(count, 8, &arg8);
 	ret |= _callfn_check(count, 9, &arg9);
-	ret |= _callfn_check(count, 10, &arg9);
-	ret |= _callfn_check(count, 11, &arg9);
-	ret |= _callfn_check(count, 12, &arg9);
+	ret |= _callfn_check(count, 10, &arg10);
+	ret |= _callfn_check(count, 11, &arg11);
+	ret |= _callfn_check(count, 12, &arg12);
 	return ret;
 }
 
