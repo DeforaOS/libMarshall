@@ -342,7 +342,9 @@ return_variable_set_from:
 #endif
 	cmp	$0x0, %rax
 	jne	error
+#if 0 /* fallback */
 	jmp	return_done
+#endif
 return_done:
 	mov	$0x0, %rax
 	jmp	ret
