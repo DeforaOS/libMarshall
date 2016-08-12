@@ -36,55 +36,55 @@
 #include "System/Marshall.h"
 
 #ifndef PROGNAME
-# define PROGNAME	"callfn"
+# define PROGNAME	"calldn"
 #endif
 
 
 /* private */
 /* prototypes */
-static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
-		float arg4, float arg5, float arg6, float arg7,
-		float arg8, float arg9, float arg10, float arg11,
-		float arg12);
+static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
+		double arg4, double arg5, double arg6, double arg7,
+		double arg8, double arg9, double arg10, double arg11,
+		double arg12);
 
 
 /* functions */
-/* callfn */
-static int32_t _callfn_check(int32_t count, int32_t pos, float * arg);
+/* calldn */
+static int32_t _calldn_check(int32_t count, int32_t pos, double * arg);
 
-static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
-		float arg4, float arg5, float arg6, float arg7,
-		float arg8, float arg9, float arg10, float arg11,
-		float arg12)
+static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
+		double arg4, double arg5, double arg6, double arg7,
+		double arg8, double arg9, double arg10, double arg11,
+		double arg12)
 {
 	int32_t ret = 0;
 
 	fprintf(stderr, "%s: %s(%d)\n", PROGNAME, __func__, count);
-	ret |= _callfn_check(count, 1, &arg1);
-	ret |= _callfn_check(count, 2, &arg2);
-	ret |= _callfn_check(count, 3, &arg3);
-	ret |= _callfn_check(count, 4, &arg4);
-	ret |= _callfn_check(count, 5, &arg5);
-	ret |= _callfn_check(count, 6, &arg6);
-	ret |= _callfn_check(count, 7, &arg7);
-	ret |= _callfn_check(count, 8, &arg8);
-	ret |= _callfn_check(count, 9, &arg9);
-	ret |= _callfn_check(count, 10, &arg10);
-	ret |= _callfn_check(count, 11, &arg11);
-	ret |= _callfn_check(count, 12, &arg12);
+	ret |= _calldn_check(count, 1, &arg1);
+	ret |= _calldn_check(count, 2, &arg2);
+	ret |= _calldn_check(count, 3, &arg3);
+	ret |= _calldn_check(count, 4, &arg4);
+	ret |= _calldn_check(count, 5, &arg5);
+	ret |= _calldn_check(count, 6, &arg6);
+	ret |= _calldn_check(count, 7, &arg7);
+	ret |= _calldn_check(count, 8, &arg8);
+	ret |= _calldn_check(count, 9, &arg9);
+	ret |= _calldn_check(count, 10, &arg10);
+	ret |= _calldn_check(count, 11, &arg11);
+	ret |= _calldn_check(count, 12, &arg12);
 	return ret;
 }
 
-static int32_t _callfn_check(int32_t count, int32_t pos, float * arg)
+static int32_t _calldn_check(int32_t count, int32_t pos, double * arg)
 {
-	float f;
+	double d;
 
 	if(pos <= count)
 	{
 		fprintf(stderr, "%d: %f\n", count, *arg);
-		f = 1111.1;
-		f = f * pos;
-		return (f == (*arg)) ? 0 : 1;
+		d = 1111.1;
+		d = d * pos;
+		return (d == (*arg)) ? 0 : 1;
 	}
 	return 0;
 }
@@ -100,7 +100,7 @@ int main(void)
 	const size_t count = 13;
 	Variable ** args;
 	int32_t i32;
-	float f;
+	double d;
 	Variable * res;
 
 	i32 = 0;
@@ -113,9 +113,9 @@ int main(void)
 	}
 	for(i = 0; i < count; i++)
 	{
-		f = 1111.1;
-		f = f * i;
-		if((args[i] = variable_new(VT_FLOAT, &f)) == NULL)
+		d = 1111.1;
+		d = d * i;
+		if((args[i] = variable_new(VT_DOUBLE, &d)) == NULL)
 			ret = 3;
 	}
 	for(i = 0; ret == 0 && i < count; i++)
@@ -123,7 +123,7 @@ int main(void)
 		i32 = i;
 		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
 			ret = i + 4;
-		else if(marshall_call(res, (MarshallCallback)_callfn, i + 1,
+		else if(marshall_call(res, (MarshallCallback)_calldn, i + 1,
 					args) != 0)
 			ret = i + 4;
 		else if(variable_get_as(res, VT_INT32, &i32) != 0 || i32 != 0)
