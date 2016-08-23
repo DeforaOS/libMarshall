@@ -24,6 +24,17 @@ DATE="date"
 
 
 #functions
+#date
+_date()
+{
+	if [ -n "$SOURCE_EPOCH" ]; then
+		$DATE -d "@$SOURCE_EPOCH" '+%a %b %d %T %Z %Y'
+	else
+		$DATE
+	fi
+}
+
+
 #fail
 _fail()
 {
@@ -112,7 +123,7 @@ case "$(uname -s)-$(uname -m)" in
 		;;
 esac
 
-$DATE > "$target"
+_date > "$target"
 FAILED=
 echo "Performing tests:" 1>&2
 for test in $tests; do
