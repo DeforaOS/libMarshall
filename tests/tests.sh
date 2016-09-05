@@ -110,18 +110,23 @@ target="$1"
 
 [ "$clean" -ne 0 ]			&& exit 0
 
-tests="includes pkgconfig.sh"
-failures="call0 calldn callf callfn calln calls"
-case "$(uname -s)-$(uname -m)" in
-	*-amd64|*-x86_64)
-		tests="$tests call0 calldn callf callfn calln calls"
-		failures=""
-		;;
-	*-i386)
-		tests="$tests call0 callf callfn calln calls"
-		failures="calldn"
-		;;
-esac
+if [ -n "$PKG_CONFIG_SYSROOT_DIR" ]; then
+	tests="pkgconfig.sh"
+	failures=
+else
+	tests="includes pkgconfig.sh"
+	failures="call0 calldn callf callfn calln calls"
+	case "$(uname -s)-$(uname -m)" in
+		*-amd64|*-x86_64)
+			tests="$tests call0 calldn callf callfn calln calls"
+			failures=""
+			;;
+		*-i386)
+			tests="$tests call0 callf callfn calln calls"
+			failures="calldn"
+			;;
+	esac
+fi
 
 _date > "$target"
 FAILED=
