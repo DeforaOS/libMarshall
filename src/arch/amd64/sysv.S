@@ -40,7 +40,7 @@ marshall_call:
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
-	movq	$0x0, -0x28(%rbp)		/* VariableType */
+	movq	$0x0, -0x28(%rbp)		/* VariableType type */
 	movq	$0x0, -0x30(%rbp)		/* size_t args_pos */
 	movq	$0x0, -0x38(%rbp)		/* long rdi */
 	movq	$0x0, -0x40(%rbp)		/* long rsi */
@@ -58,7 +58,7 @@ type:
 	/* get the return type */
 	cmpq	NULL, %rdi
 	je	type_done
-#ifdef __PIC__					/* variable_get_type() */
+#ifdef __PIC__					/* type = variable_get_type() */
 	call	variable_get_type@PLT
 #else
 	call	variable_get_type
