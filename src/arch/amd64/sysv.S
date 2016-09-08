@@ -35,7 +35,7 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0x90, %rsp
+	sub	$0xa0, %rsp
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
@@ -54,6 +54,8 @@ marshall_call:
 	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x88(%rbp)		/* size_t args_cnt_sse */
 	movq	$0x0, -0x90(%rbp)		/* size_t pos */
+	movq	$0x0, -0x9f(%rbp)		/* size_t offset2 */
+	movq	$0x0, -0xa0(%rbp)		/* size_t */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
@@ -208,6 +210,8 @@ args_type:
 	jle	args_SSE
 	cmpq	VT_STRING, %rax
 	je	args_INTEGER
+	cmpq	VT_POINTER, %rax
+	je	args_POINTER
 	jmp	args_error
 args_INTEGER:
 	mov	-0x20(%rbp), %rdx
@@ -264,6 +268,91 @@ args_INTEGER_more:
 	jmp	args_INTEGER_loop
 #endif
 args_INTEGER_loop:
+	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	jmp	args_loop
+args_POINTER:
+	mov	-0x20(%rbp), %rdx
+	mov	-0x30(%rbp), %rdi
+	mov	(%rdx, %rdi, 8), %rdi
+	mov	%rax, %rsi
+	lea	-0x78(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	args_error			/*	goto args_error */
+	mov	-0x78(%rbp), %rdi
+#ifdef __PIC__
+	call	variable_get_type@PLT
+#else
+	call	variable_get_type
+#endif
+	mov	-0x78(%rbp), %rdi
+	mov	%rax, %rsi
+	mov	%rsp, %rdx
+	subq	-0x9f(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax
+	jne	error
+	mov	-0x78(%rbp), %rdi
+#ifdef __PIC__
+	call	variable_get_size@PLT
+#else
+	call	variable_get_size
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_size() == 0) */
+	jne	args_error			/*	goto args_error */
+	mov	%rax, %rdi			/* %rdi = %rax */
+	mov	%rsp, %rax			/* %rax = %rsp + offset2 */
+	subq	-0x9f(%rbp), %rax
+	addq	%rdi, -0x9f(%rbp)		/* offset2 += %rdi */
+	cmpq	$0x0, -0x70(%rbp)
+	je	args_POINTER_0
+	cmpq	$0x1, -0x70(%rbp)
+	je	args_POINTER_1
+	cmpq	$0x2, -0x70(%rbp)
+	je	args_POINTER_2
+	cmpq	$0x3, -0x70(%rbp)
+	je	args_POINTER_3
+	cmpq	$0x4, -0x70(%rbp)
+	je	args_POINTER_4
+	cmpq	$0x5, -0x70(%rbp)
+	je	args_POINTER_5
+	jg	args_POINTER_more
+	jmp	error
+args_POINTER_0:
+	mov	%rax, -0x38(%rbp)		/* rdi */
+	jmp	args_POINTER_loop
+args_POINTER_1:
+	mov	%rax, -0x40(%rbp)		/* rsi */
+	jmp	args_POINTER_loop
+args_POINTER_2:
+	mov	%rax, -0x48(%rbp)		/* rdx */
+	jmp	args_POINTER_loop
+args_POINTER_3:
+	mov	%rax, -0x50(%rbp)		/* rcx */
+	jmp	args_POINTER_loop
+args_POINTER_4:
+	mov	%rax, -0x58(%rbp)		/* r8 */
+	jmp	args_POINTER_loop
+args_POINTER_5:
+	mov	%rax, -0x60(%rbp)		/* r9 */
+	jmp	args_POINTER_loop
+args_POINTER_more:
+	mov	%rsp, %rdx			/* rdx = rsp + pos */
+	addq	-0x90(%rbp), %rdx
+	mov	%rax, (%rdx)			/* *rdx = rax */
+	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
+#if 0 /* fallback */
+	jmp	args_POINTER_loop
+#endif
+args_POINTER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	args_loop
 args_SSE:
