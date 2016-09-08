@@ -92,6 +92,8 @@ count_type:
 	jle	count_SSE
 	cmpq	VT_STRING, %rax
 	je	count_INTEGER
+	cmpq	VT_POINTER, %rax
+	je	count_POINTER
 	jmp	count_error
 count_INTEGER:
 	cmpq	$0x5, -0x70(%rbp)
@@ -107,6 +109,42 @@ count_INTEGER_more:
 	jmp	count_INTEGER_loop
 #endif
 count_INTEGER_loop:
+	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	jmp	count_loop
+count_POINTER:
+	cmpq	$0x5, -0x70(%rbp)
+	jle	count_POINTER_registers
+	jmp	count_POINTER_more
+count_POINTER_registers:
+	jmp	count_POINTER_loop
+count_POINTER_more:
+	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	jmp	count_POINTER_loop
+count_POINTER_loop:
+	mov	%rax, %rsi
+	mov	-0x20(%rbp), %rax
+	mov	-0x30(%rbp), %rdi
+	mov	(%rax, %rdi, 8), %rdi
+	lea	-0x78(%rbp), %rdx
+#ifdef __PIC__
+	call	variable_get_as@PLT
+#else
+	call	variable_get_as
+#endif
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	count_error			/*	goto count_error */
+	mov	-0x20(%rbp), %rax
+	mov	-0x30(%rbp), %rdi
+	mov	(%rax, %rdi, 8), %rdi
+#ifdef __PIC__
+	call	variable_get_size@PLT
+#else
+	call	variable_get_size
+#endif
+	/* FIXME really verify the type and recurse through pointers */
+	cmp	$0x0, %rax			/* if(variable_get_size() == 0) */
+	jne	count_error			/*	goto count_error */
+	add	%rax, -0x68(%rbp)		/* offset += %rax */
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	count_loop
 count_SSE:
