@@ -42,6 +42,8 @@
 	|| defined(__NetBSD__) \
 	|| defined(__OpenBSD__)
 #  include "arch/amd64/sysv.S"
+# elif defined(_WIN64)
+#  include "arch/amd64/x64.S"
 # else
 #  warning Unsupported AMD64 ABI
 # endif
