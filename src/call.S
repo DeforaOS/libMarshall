@@ -37,7 +37,8 @@
 
 /* amd64 */
 #if defined(__amd64__)
-# if defined(__FreeBSD__) \
+# if defined(__APPLE__) \
+	|| defined(__FreeBSD__) \
 	|| defined(__linux__) \
 	|| defined(__NetBSD__) \
 	|| defined(__OpenBSD__)
