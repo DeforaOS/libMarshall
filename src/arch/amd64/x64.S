@@ -49,12 +49,12 @@ marshall_call:
 	movq	$0x0, -0x50(%rbp)		/* long r9 */
 	movq	$0x0, -0x58(%rbp)		/* XXX padding */
 	movq	$0x0, -0x60(%rbp)		/* XXX padding */
-	movq	$0x0, -0x68(%rbp)		/* size_t offset */
+	movq	$0x20, -0x68(%rbp)		/* size_t offset */
 	movq	$0x0, -0x70(%rbp)		/* size_t args_cnt_integer */
 	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
 	movq	$0x0, -0x88(%rbp)		/* size_t args_cnt_sse */
-	movq	$0x0, -0x90(%rbp)		/* size_t pos */
+	movq	$0x20, -0x90(%rbp)		/* size_t pos */
 	movq	$0x0, -0x9f(%rbp)		/* size_t offset2 */
 	movq	$0x0, -0xa0(%rbp)		/* size_t */
 type:
