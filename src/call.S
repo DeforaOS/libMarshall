@@ -53,7 +53,8 @@
 # if defined(__FreeBSD__) \
 	|| defined(__linux__) \
 	|| defined(__NetBSD__) \
-	|| defined(__OpenBSD__)
+	|| defined(__OpenBSD__) \
+	|| defined(_WIN32)
 #  include "arch/i386/cdecl.S"
 # else
 #  warning Unsupported x86 ABI
