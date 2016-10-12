@@ -36,7 +36,7 @@
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0xa0, %rsp
+	sub	$0xa8, %rsp
 	mov	%rcx, -0x08(%rbp)		/* Variable * ret */
 	mov	%rdx, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%r8, -0x18(%rbp)		/* size_t args_cnt */
