@@ -99,7 +99,9 @@ static int _error(char const * error, int ret)
 /* usage */
 static int _usage(void)
 {
-	fputs("Usage: " PROGNAME " filename method [arguments...]\n", stderr);
+	fputs("Usage: " PROGNAME " filename method [arguments...]\n"
+"       " PROGNAME " -s method [arguments...]\n"
+"  -s	Look for callbacks inside " PROGNAME " itself\n", stderr);
 	return 1;
 }
 
@@ -110,20 +112,35 @@ static int _usage(void)
 int main(int argc, char * argv[])
 {
 	int o;
+	int self = 0;
+	int offset = 2;
+	char const * filename;
 
-	while((o = getopt(argc, argv, "")) != -1)
+	while((o = getopt(argc, argv, "s")) != -1)
 		switch(o)
 		{
+			case 's':
+				self = 1;
+				break;
 			default:
 				return _usage();
 		}
-	if(argc - optind < 2)
+	if(self)
+	{
+		offset = 1;
+		filename = NULL;
+	}
+	else
+		filename = argv[optind];
+	/* check usage accordingly */
+	if(argc - optind < offset)
 		return _usage();
 #if 1 /* XXX */
-	if(argc - optind > 2)
+	if(argc - optind > offset)
 		return _error(strerror(ENOSYS), 2);
 #endif
-	if(_runso(argv[optind], argv[optind + 1], &argv[optind + 2]) != 0)
+	if(_runso(filename, argv[optind + offset - 1], &argv[optind + offset])
+			!= 0)
 		return 2;
 	return 0;
 }
