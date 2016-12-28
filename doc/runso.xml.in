@@ -56,6 +56,14 @@
 				<arg choice="opt"><replaceable>argument</replaceable></arg>
 			</arg>
 		</cmdsynopsis>
+		<cmdsynopsis>
+			<command>&name;</command>
+			<arg choice="plain"><option>-s</option></arg>
+			<arg choice="plain"><replaceable>method</replaceable></arg>
+			<arg choice="plain" rep="repeat">
+				<arg choice="opt"><replaceable>argument</replaceable></arg>
+			</arg>
+		</cmdsynopsis>
 	</refsynopsisdiv>
 	<refsect1 id="description">
 		<title>Description</title>
@@ -67,6 +75,16 @@
 		<para><command>&name;</command> expects a path to the binary file to open, the
 			name of a symbol to look up, and an optional list of arguments to be given on
 			the command line.</para>
+		<para>If the <option>-s</option> option is set, <command>&name;</command> will
+			look for symbols within its own process image at run-time.</para>
+		<variablelist>
+			<varlistentry>
+				<term><option>-s</option></term>
+				<listitem>
+					<para>Look for callbacks inside &name; itself.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
 	</refsect1>
 	<refsect1 id="bugs">
 		<title>Bugs</title>
