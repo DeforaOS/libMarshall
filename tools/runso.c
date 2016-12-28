@@ -51,6 +51,9 @@ static int _usage(void);
 
 /* functions */
 /* runso */
+static int _runso_callback(char const * method, MarshallCallback callback,
+		char ** args);
+
 static int _runso(char const * filename, char const * method, char ** args)
 {
 	int ret = 0;
@@ -61,10 +64,27 @@ static int _runso(char const * filename, char const * method, char ** args)
 		return _error(dlerror(), -1);
 	if((callback = dlsym(handler, method)) == NULL)
 		ret = _error(dlerror(), -1);
-	else if(marshall_call(NULL, callback, 0, NULL) != 0)
-		ret = _error(error_get(NULL), -1);
+	else
+		ret = _runso_callback(method, callback, args);
 	dlclose(handler);
 	return ret;
+}
+
+static int _runso_callback(char const * method, MarshallCallback callback,
+		char ** args)
+{
+	Variable * v;
+	int32_t i32;
+
+	if((v = variable_new(VT_INT32, &i32)) == NULL)
+		return _error(error_get(NULL), -1);
+	if(marshall_call(v, callback, 0, NULL) != 0)
+		return _error(error_get(NULL), -1);
+	else if(variable_get_as(v, VT_INT32, &i32) != 0)
+		_error(error_get(NULL), -1);
+	else
+		printf("%s: %s returned %d\n", PROGNAME, method, i32);
+	return 0;
 }
 
 
