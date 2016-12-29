@@ -93,13 +93,17 @@ count_type:
 	jmp	count_error
 count_INTEGER:
 	cmpq	$0x5, -0x70(%rbp)
-	jle	count_INTEGER_registers
-	jmp	count_INTEGER_more
+	jg	count_INTEGER_more
+#if 0 /* fallback */
+	jmp	count_INTEGER_registers
+#endif
 count_INTEGER_registers:
 	jmp	count_INTEGER_loop
 count_INTEGER_more:
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+#if 0 /* fallback */
 	jmp	count_INTEGER_loop
+#endif
 count_INTEGER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	count_loop
