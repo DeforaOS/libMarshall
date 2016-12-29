@@ -70,8 +70,10 @@ count:
 	mov	-0x18(%rbp), %rdx
 	cmp	%rdx, %rdi
 	je	count_round			/* 	goto count_round */
+#if 0 /* should not happen */
 	jg	count_error			/* else if(args_pos > args_cnt)
 							goto count_error */
+#endif
 count_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi
@@ -146,8 +148,10 @@ args:
 	mov	-0x18(%rbp), %rdx
 	cmp	%rdx, %rdi
 	je	args_done			/* 	goto args_done */
+#if 0 /* should not happen */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto args_error */
+#endif
 args_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi

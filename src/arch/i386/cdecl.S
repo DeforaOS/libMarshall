@@ -55,8 +55,10 @@ count:
 	mov	-0x8(%ebp), %edx
 	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	count_done			/*	goto count_done */
+#if 0 /* should not happen */
 	jg	count_error			/* else if(args_pos > args_cnt)
 							goto count_error */
+#endif
 count_type:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
@@ -104,8 +106,10 @@ args:
 	mov	-0x8(%ebp), %edx
 	cmp	%eax, %edx			/* if(args_pos == args_cnt) */
 	je	args_done			/*	goto args_done */
+#if 0 /* should not happen */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto args_error */
+#endif
 args_type:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
