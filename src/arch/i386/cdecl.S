@@ -79,14 +79,10 @@ count_type:
 	jmp	count_error
 count_INTEGER:
 	addl	$0x4, -0x14(%ebp)		/* offset += 4 */
-#if 0 /* fallback */
 	jmp	count_loop
-#endif
 count_INTEGER64:
 	addl	$0x8, -0x14(%ebp)		/* offset += 8 */
-#if 0 /* fallback */
 	jmp	count_loop
-#endif
 count_FLOAT:
 	addl	$0x4, -0x14(%ebp)		/* offset += 4 */
 	jmp	count_loop
