@@ -358,10 +358,14 @@ return_variable_set_from:
 #endif
 return_done:
 	mov	$0x0, %rax
-	jmp	ret
+	jmp	return_mmx
 error:
 	mov	$-1, %rax
-ret:
+return_mmx:
+	cmp	$0x0, -0x88(%rbp)		/* if(args_cnt_sse == 0) */
+	je	return_mmx_done			/*	goto return_mmx_done; */
+	emms
+return_mmx_done:
 	mov	%rbp, %rsp
 	pop	%rbp
 	ret
