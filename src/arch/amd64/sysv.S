@@ -362,7 +362,7 @@ return_done:
 error:
 	mov	$-1, %rax
 return_mmx:
-	cmp	$0x0, -0x88(%rbp)		/* if(args_cnt_sse == 0) */
+	cmpq	$0x0, -0x88(%rbp)		/* if(args_cnt_sse == 0) */
 	je	return_mmx_done			/*	goto return_mmx_done; */
 	emms
 return_mmx_done:
