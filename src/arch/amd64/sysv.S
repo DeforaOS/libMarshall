@@ -36,24 +36,25 @@ marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
 	sub	$0x90, %rsp
+	xor	%rax, %rax
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
 	mov	%rsi, -0x10(%rbp)		/* MarshallCallback callback */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
-	movq	$0x0, -0x28(%rbp)		/* VariableType type */
-	movq	$0x0, -0x30(%rbp)		/* size_t args_pos */
-	movq	$0x0, -0x38(%rbp)		/* long rdi */
-	movq	$0x0, -0x40(%rbp)		/* long rsi */
-	movq	$0x0, -0x48(%rbp)		/* long rdx */
-	movq	$0x0, -0x50(%rbp)		/* long rcx */
-	movq	$0x0, -0x58(%rbp)		/* long r8 */
-	movq	$0x0, -0x60(%rbp)		/* long r9 */
-	movq	$0x0, -0x68(%rbp)		/* size_t offset */
-	movq	$0x0, -0x70(%rbp)		/* size_t args_cnt_integer */
-	movq	$0x0, -0x78(%rbp)		/* uint64_t u64 */
-	movq	$0x0, -0x80(%rbp)		/* uint64_t u64 */
-	movq	$0x0, -0x88(%rbp)		/* size_t args_cnt_sse */
-	movq	$0x0, -0x90(%rbp)		/* size_t pos */
+	movq	%rax, -0x28(%rbp)		/* VariableType type */
+	movq	%rax, -0x30(%rbp)		/* size_t args_pos */
+	movq	%rax, -0x38(%rbp)		/* long rdi */
+	movq	%rax, -0x40(%rbp)		/* long rsi */
+	movq	%rax, -0x48(%rbp)		/* long rdx */
+	movq	%rax, -0x50(%rbp)		/* long rcx */
+	movq	%rax, -0x58(%rbp)		/* long r8 */
+	movq	%rax, -0x60(%rbp)		/* long r9 */
+	movq	%rax, -0x68(%rbp)		/* size_t offset */
+	movq	%rax, -0x70(%rbp)		/* size_t args_cnt_integer */
+	movq	%rax, -0x78(%rbp)		/* uint64_t u64 */
+	movq	%rax, -0x80(%rbp)		/* uint64_t u64 */
+	movq	%rax, -0x88(%rbp)		/* size_t args_cnt_sse */
+	movq	%rax, -0x90(%rbp)		/* size_t pos */
 type:
 	/* get the return type */
 	cmpq	NULL, %rdi
@@ -140,9 +141,10 @@ count_round:
 	addq	$0x8, -0x68(%rbp)		/*	offset += 0x8 */
 count_done:
 	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
-	movq	$0x0, -0x70(%rbp)		/* args_cnt_integer = 0 */
-	movq	$0x0, -0x88(%rbp)		/* args_cnt_sse = 0 */
-	movq	$0x0, -0x30(%rbp)		/* args_pos = 0 */
+	xor	%rax, %rax
+	movq	%rax, -0x70(%rbp)		/* args_cnt_integer = 0 */
+	movq	%rax, -0x88(%rbp)		/* args_cnt_sse = 0 */
+	movq	%rax, -0x30(%rbp)		/* args_pos = 0 */
 args:
 	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
 	mov	-0x18(%rbp), %rdx
