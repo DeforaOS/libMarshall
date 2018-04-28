@@ -99,6 +99,7 @@ static int _error(char const * error, int ret)
 /* usage */
 static int _usage(void)
 {
+	/* TODO allow listing the methods available */
 	fputs("Usage: " PROGNAME " filename method [arguments...]\n"
 "       " PROGNAME " -s method [arguments...]\n"
 "  -s	Look for callbacks inside " PROGNAME " itself\n", stderr);
