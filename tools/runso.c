@@ -75,6 +75,7 @@ static int _runso_callback(char const * method, MarshallCallback callback,
 {
 	Variable * v;
 	int32_t i32;
+	(void) args;
 
 	if((v = variable_new(VT_INT32, &i32)) == NULL)
 		return _error(error_get(NULL), -1);
