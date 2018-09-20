@@ -29,6 +29,7 @@
 
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #if 1 /* XXX */
 # include <string.h>
@@ -43,7 +44,8 @@
 
 /* private */
 /* prototypes */
-static int _runso(char const * filename, char const * method, char ** args);
+static int _runso(char const * filename, char const * method, int argc,
+		char ** argv);
 
 static int _error(char const * error, int ret);
 static int _usage(void);
@@ -52,9 +54,10 @@ static int _usage(void);
 /* functions */
 /* runso */
 static int _runso_callback(char const * method, MarshallCallback callback,
-		char ** args);
+		int argc, char ** argv);
 
-static int _runso(char const * filename, char const * method, char ** args)
+static int _runso(char const * filename, char const * method, int argc,
+		char ** argv)
 {
 	int ret = 0;
 	void * handler;
@@ -65,27 +68,39 @@ static int _runso(char const * filename, char const * method, char ** args)
 	if((callback = dlsym(handler, method)) == NULL)
 		ret = _error(dlerror(), -1);
 	else
-		ret = _runso_callback(method, callback, args);
+		ret = _runso_callback(method, callback, argc, argv);
 	dlclose(handler);
 	return ret;
 }
 
 static int _runso_callback(char const * method, MarshallCallback callback,
-		char ** args)
+		int argc, char ** argv)
 {
+	int ret = 0;
+	Variable ** args;
 	Variable * v;
+	int i;
 	int32_t i32;
-	(void) args;
 
+	if((args = malloc(sizeof(*args) * argc)) == NULL)
+		return _error(strerror(errno), -errno);
+	for(i = 0; i < argc; i++)
+		if((args[i] = variable_new(VT_STRING, argv[i])) == NULL)
+			ret = -_error(error_get(NULL), 1);
 	if((v = variable_new(VT_INT32, &i32)) == NULL)
-		return _error(error_get(NULL), -1);
-	if(marshall_call(v, callback, 0, NULL) != 0)
-		return _error(error_get(NULL), -1);
+		ret = -_error(error_get(NULL), 1);
+	if(ret == 0 && marshall_call(v, callback, argc, args) != 0)
+		ret = -_error(error_get(NULL), 1);
 	else if(variable_get_as(v, VT_INT32, &i32) != 0)
-		_error(error_get(NULL), -1);
+		ret = _error(error_get(NULL), -1);
 	else
 		printf("%s: %s returned %d\n", PROGNAME, method, i32);
-	return 0;
+	for(i = 0; i < argc; i++)
+		if(args[i] != NULL)
+			variable_delete(args[i]);
+	if(v != NULL)
+		variable_delete(v);
+	return ret;
 }
 
 
@@ -115,8 +130,8 @@ int main(int argc, char * argv[])
 {
 	int o;
 	int self = 0;
-	int offset = 2;
 	char const * filename;
+	char const * method;
 
 	while((o = getopt(argc, argv, "s")) != -1)
 		switch(o)
@@ -128,21 +143,14 @@ int main(int argc, char * argv[])
 				return _usage();
 		}
 	if(self)
-	{
-		offset = 1;
 		filename = NULL;
-	}
 	else
-		filename = argv[optind];
+		filename = argv[optind++];
 	/* check usage accordingly */
-	if(argc - optind < offset)
+	if(optind >= argc)
 		return _usage();
-#if 1 /* XXX */
-	if(argc - optind > offset)
-		return _error(strerror(ENOSYS), 2);
-#endif
-	if(_runso(filename, argv[optind + offset - 1], &argv[optind + offset])
-			!= 0)
+	method = argv[optind++];
+	if(_runso(filename, method, argc - optind, &argv[optind]) != 0)
 		return 2;
 	return 0;
 }
