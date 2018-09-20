@@ -95,11 +95,12 @@ static int _runso_callback(char const * method, MarshallCallback callback,
 		ret = _error(error_get(NULL), -1);
 	else
 		printf("%s: %s returned %d\n", PROGNAME, method, i32);
+	if(v != NULL)
+		variable_delete(v);
 	for(i = 0; i < argc; i++)
 		if(args[i] != NULL)
 			variable_delete(args[i]);
-	if(v != NULL)
-		variable_delete(v);
+	free(args);
 	return ret;
 }
 
