@@ -95,7 +95,7 @@
 			<listitem><para>Arguments are not supported at the moment.</para></listitem>
 		</itemizedlist>
 		<para>Further issues can be listed and reported at <ulink
-				url="http://www.defora.org/os/project/bug_list/4400/libMarshall"/>.</para>
+				url="https://www.defora.org/os/project/bug_list/4400/libMarshall"/>.</para>
 	</refsect1>
 	<refsect1 id="see_also">
 		<title>See also</title>

@@ -17,12 +17,12 @@ libMarshall depends on the following software components:
   software distributions already; otherwise at
   <http://www.freedesktop.org/wiki/Software/pkg-config/>
 - libSystem from the DeforaOS Project, as found at
-  <http://www.defora.org/os/project/27/libSystem> if not packaged for your
+  <https://www.defora.org/os/project/27/libSystem> if not packaged for your
   system.
 
 And optionally:
 - configure from the DeforaOS Project, likewise found at
-  <http://www.defora.org/os/project/16/configure>
+  <https://www.defora.org/os/project/16/configure>
 - GTK-Doc (for the API documentation), found at
   <http://www.gtk.org/gtk-doc/>
 
@@ -41,7 +41,7 @@ instructions.
 
 A default set of Makefiles is provided with releases of this project in order
 to help building and packaging. The Makefiles provided target the NetBSD
-Operating System <http://www.netbsd.org/> by default, but should work on most
+Operating System <https://www.netbsd.org/> by default, but should work on most
 platforms without changes.
 
 
