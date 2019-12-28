@@ -28,11 +28,14 @@
 
 
 
+#include "arch/common.h"
+
+
 .text
 
 
 /* marshall_call */
-.global marshall_call
+.global SYMBOL(marshall_call)
 
 
 /* amd64 */

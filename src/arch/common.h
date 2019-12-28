@@ -28,6 +28,24 @@
 
 
 
+#ifndef ARCH_COMMON_H
+# define ARCH_COMMON_H
+
+
+/* macros */
+# if defined(__APPLE__)	/* macOS */
+#  define SYMBOL(name)	_ ## name
+#  define FUNC(name)	_ ## name
+# else
+#  define SYMBOL(name)	name
+#  if defined(__PIC__)
+#  define FUNC(name)	name@PLT
+#  else
+#  define FUNC(name)	name
+#  endif
+# endif
+
+
 /* constants */
 #define NULL		$0x0
 
@@ -45,3 +63,5 @@
 #define VT_DOUBLE	$0xb
 #define VT_BUFFER	$0xc
 #define VT_STRING	$0xd
+
+#endif /* !ARCH_COMMON_H */
