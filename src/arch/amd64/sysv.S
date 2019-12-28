@@ -29,9 +29,12 @@
 
 
 #include "../common.h"
+#include "amd64.h"
 
 
+#if !defined(__APPLE__)
 .type marshall_call,@function
+#endif
 marshall_call:
 	push	%rbp
 	mov	%rsp, %rbp
@@ -59,11 +62,7 @@ type:
 	/* get the return type */
 	cmpq	NULL, %rdi
 	je	type_done
-#ifdef __PIC__					/* type = variable_get_type() */
-	call	variable_get_type@PLT
-#else
-	call	variable_get_type
-#endif
+	CALL	(variable_get_type)		/* type = variable_get_type() */
 	mov	%rax, -0x28(%rbp)
 type_done:
 count:
@@ -79,11 +78,7 @@ count_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi
 	mov	(%rax, %rdi, 8), %rdi
-#ifdef __PIC__
-	call	variable_get_type@PLT
-#else
-	call	variable_get_type
-#endif
+	CALL	(variable_get_type)
 	cmp	VT_NULL, %rax
 	je	count_round
 	/* FIXME make sure it is unsigned */
@@ -158,11 +153,7 @@ args_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rdi
 	mov	(%rax, %rdi, 8), %rdi
-#ifdef __PIC__
-	call	variable_get_type@PLT
-#else
-	call	variable_get_type
-#endif
+	CALL	(variable_get_type)
 	cmp	VT_NULL, %rax
 	je	args_done
 	/* FIXME make sure it is unsigned */
@@ -179,11 +170,7 @@ args_INTEGER:
 	mov	(%rdx, %rdi, 8), %rdi
 	mov	%rax, %rsi
 	lea	-0x78(%rbp), %rdx
-#ifdef __PIC__
-	call	variable_get_as@PLT
-#else
-	call	variable_get_as
-#endif
+	CALL	(variable_get_as)
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
 	mov	-0x78(%rbp), %rax
@@ -236,11 +223,7 @@ args_SSE:
 	mov	(%rdx, %rdi, 8), %rdi
 	mov	%rax, %rsi
 	lea	-0x80(%rbp), %rdx
-#ifdef __PIC__
-	call	variable_get_as@PLT
-#else
-	call	variable_get_as
-#endif
+	CALL	(variable_get_as)
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
 	cmpq	$0x0, -0x88(%rbp)
@@ -348,11 +331,7 @@ return_SSE:
 return_variable_set_from:
 	mov	-0x08(%rbp), %rdi
 	mov	-0x28(%rbp), %rsi
-#ifdef __PIC__					/* variable_set_from() */
-	call	variable_set_from@PLT
-#else
-	call	variable_set_from
-#endif
+	CALL	(variable_set_from)
 	cmp	$0x0, %rax
 	jne	error
 #if 0 /* fallback */
