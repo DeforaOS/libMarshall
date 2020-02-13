@@ -3,25 +3,30 @@
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
 [
   <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
-  <!ENTITY server "www.defora.org/doc/gtk-doc/html">
-  <!ENTITY title "DeforaOS libMarshall">
-  <!ENTITY version "0.3.0">
+  <!ENTITY % gtkdocentities SYSTEM "xml/gtkdocentities.ent">
+  %gtkdocentities;
 ]>
-<book id="index">
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>libMarshall Reference Manual</title>
+    <title>&package_name; Reference Manual</title>
     <releaseinfo>
-      for libMarshall &version;.
+      for &package_string;.
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="https://&server;/libMarshall/index.html">https://&server;/libMarshall/</ulink>.
+      <ulink role="online-location" url="https://&server;/&package_name;/">https://&server;/&package_name;/</ulink>.
     </releaseinfo>
   </bookinfo>
 
   <chapter>
-    <title>[Insert title here]</title>
+    <title>&title;</title>
         <xi:include href="xml/Marshall.xml"/>
 
   </chapter>
+  <!-- enable this when you use gobject types
+  <chapter id="object-tree">
+    <title>Object Hierarchy</title>
+    <xi:include href="xml/tree_index.sgml"/>
+  </chapter>
+  -->
   <index id="api-index-full">
     <title>API Index</title>
     <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
@@ -30,6 +35,7 @@
     <title>Index of deprecated API</title>
     <xi:include href="xml/api-index-deprecated.xml"><xi:fallback /></xi:include>
   </index>
-
+  <!-- enable this when you use gobject introspection annotations
   <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
+  -->
 </book>
