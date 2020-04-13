@@ -28,10 +28,9 @@
 
 
 
-#include "../common.h"
-
-
+#if !defined(__APPLE__)
 .type marshall_callp,@function
+#endif
 marshall_callp:
 	push	%ebp
 	mov	%esp, %ebp
@@ -46,7 +45,7 @@ type:
 	cmpl	NULL, 0x8(%ebp)
 	je	type_done
 	push	0x8(%ebp)
-	call	variable_get_type		/* variable_get_type(res) */
+	call	FUNC(variable_get_type)		/* variable_get_type(res) */
 	add	$0x4, %esp
 	mov	%eax, -0x4(%ebp)
 type_done:
@@ -63,7 +62,7 @@ count_type:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_type		/* variable_get_type(eax) */
+	call	FUNC(variable_get_type)		/* variable_get_type(eax) */
 	add	$0x4, %esp
 	cmp	VT_NULL, %eax
 	je	count_done
@@ -114,7 +113,7 @@ args_type:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_type		/* variable_get_type(eax) */
+	call	FUNC(variable_get_type)		/* variable_get_type(eax) */
 	add	$0x4, %esp
 	cmp	VT_NULL, %eax
 	je	args_done
@@ -138,7 +137,7 @@ args_INTEGER:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* eax = variable_get_as() */
+	call	FUNC(variable_get_as)		/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
@@ -156,7 +155,7 @@ args_INTEGER64:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* eax = variable_get_as() */
+	call	FUNC(variable_get_as)		/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
@@ -178,7 +177,7 @@ args_FLOAT:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* eax = variable_get_as() */
+	call	FUNC(variable_get_as)		/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
@@ -193,7 +192,7 @@ args_DOUBLE:
 	mov	0x14(%ebp), %eax		/* eax = args */
 	mov	-0x8(%ebp), %edx		/* edx = args_pos */
 	push	(%eax, %edx, 4)			/* eax = args[args_pos] */
-	call	variable_get_as			/* eax = variable_get_as() */
+	call	FUNC(variable_get_as)		/* eax = variable_get_as() */
 						/* XXX memory leak */
 	add	$0xc, %esp
 	cmp	$0x0, %eax			/* if(eax != 0) */
@@ -267,7 +266,7 @@ return_POINTER:
 	push	0x8(%ebp)			/* Variable * ret */
 	jmp	return_variable_set_from
 return_variable_set_from:
-	call	variable_set_from
+	call	FUNC(variable_set_from)
 	add	$0xc, %esp
 	cmp	$0x0, %eax
 	jne	error
