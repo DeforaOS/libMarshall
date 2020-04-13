@@ -31,7 +31,7 @@
 #ifndef LIBMARSHALL_SYSTEM_MARSHALL_H
 # define LIBMARSHALL_SYSTEM_MARSHALL_H
 
-# include <stdarg.h>
+# include <stddef.h>
 # include <System.h>
 
 
