@@ -29,7 +29,6 @@
 
 
 #include <inttypes.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <System/variable.h>
@@ -96,7 +95,7 @@ int main(void)
 	i32 = 0;
 	if((res = variable_new(VT_INT32, &i32)) == NULL)
 		return 2;
-	if((args = malloc(sizeof(*args) * count)) == NULL)
+	if((args = object_new(sizeof(*args) * count)) == NULL)
 	{
 		variable_delete(res);
 		return 2;
@@ -122,6 +121,6 @@ int main(void)
 		if(args[i] != NULL)
 			variable_delete(args[i]);
 	variable_delete(res);
-	free(args);
+	object_delete(args);
 	return ret;
 }
