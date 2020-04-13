@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2016 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2020 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS System libMarshall */
 /* All rights reserved.
  *
@@ -28,79 +28,42 @@
 
 
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include "System/Marshall.h"
 
-#ifndef PROGNAME
-# define PROGNAME	"callf"
-#endif
 
-
-/* private */
-/* prototypes */
-static double _callf_double(double d);
-static float _callf_float(float f);
-
-
-/* functions */
-/* callf_double */
-static double _callf_double(double d)
-{
-	double ret = M_PI - 1.0;
-
-	fprintf(stderr, "%s: %s(%f) => %f\n", PROGNAME, __func__, d, ret);
-	if(d != 1.0)
-		return -1.0;
-	return ret;
-}
-
-
-/* callf_float */
-static float _callf_float(float f)
-{
-	float ret = M_PI - 1.0;
-
-	fprintf(stderr, "%s: %s(%f) => %f\n", PROGNAME, __func__, f, ret);
-	if(f != 1.0)
-		return -1.0;
-	return ret;
-}
-
-
+/* MarshallCall */
 /* public */
 /* functions */
-/* main */
-int main(void)
+/* marshall_call */
+int marshall_call(Variable * res, MarshallCall call,
+		size_t args_cnt, ...)
 {
 	int ret;
-	Variable * res;
-	float f = 1.0;
-	double d = 1.0;
+	va_list ap;
 
-	/* VT_FLOAT */
-	if((res = variable_new(VT_FLOAT, &f)) == NULL)
-		return 2;
-	if((ret = marshall_callp(res, (MarshallCall)_callf_float, 1, &res))
-			== 0)
-		ret = variable_get_as(res, VT_FLOAT, &f);
-	variable_delete(res);
-	if(ret != 0)
-		return 3;
-	if(f + 1.0 != (float)M_PI)
-		return 4;
-	/* VT_DOUBLE */
-	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
-		return 5;
-	if((ret = marshall_callp(res, (MarshallCall)_callf_double, 1, &res))
-			== 0)
-		ret = variable_get_as(res, VT_DOUBLE, &d);
-	variable_delete(res);
-	if(ret != 0)
-		return 6;
-	if(d + 1.0 != M_PI)
-		return 7;
-	return 0;
+	va_start(ap, args_cnt);
+	ret = marshall_callv(res, call, args_cnt, ap);
+	va_end(ap);
+	return ret;
+}
+
+
+/* marshall_callv */
+int marshall_callv(Variable * res, MarshallCall call,
+		size_t args_cnt, va_list ap)
+{
+
+	int ret;
+	Variable ** args;
+	size_t i;
+
+	if(args_cnt == 0)
+		args = NULL;
+	else if((args = object_new(sizeof(*args) * args_cnt)) == NULL)
+		return -1;
+	for(i = 0; i < args_cnt; i++)
+		args[i] = va_arg(ap, Variable *);
+	ret = marshall_callp(res, call, args_cnt, args);
+	object_delete(args);
+	return ret;
 }

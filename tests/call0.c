@@ -115,7 +115,7 @@ int main(void)
 	/* VT_INT32 */
 	if((res = variable_new(VT_INT32, &r32)) == NULL)
 		return 2;
-	if((ret = marshall_call(res, (MarshallCallback)_call0_int32, 0, NULL))
+	if((ret = marshall_callp(res, (MarshallCall)_call0_int32, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_INT32, &r32);
 	variable_delete(res);
@@ -126,7 +126,7 @@ int main(void)
 	/* VT_INT64 */
 	if((res = variable_new(VT_INT64, &r64)) == NULL)
 		return 5;
-	if((ret = marshall_call(res, (MarshallCallback)_call0_int64, 0, NULL))
+	if((ret = marshall_callp(res, (MarshallCall)_call0_int64, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_INT64, &r64);
 	variable_delete(res);
@@ -137,7 +137,7 @@ int main(void)
 	/* VT_DOUBLE */
 	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
 		return 8;
-	if((ret = marshall_call(res, (MarshallCallback)_call0_double, 0, NULL))
+	if((ret = marshall_callp(res, (MarshallCall)_call0_double, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_DOUBLE, &d);
 	variable_delete(res);
@@ -148,7 +148,7 @@ int main(void)
 	/* VT_FLOAT */
 	if((res = variable_new(VT_FLOAT, &f)) == NULL)
 		return 11;
-	if((ret = marshall_call(res, (MarshallCallback)_call0_float, 0, NULL))
+	if((ret = marshall_callp(res, (MarshallCall)_call0_float, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_FLOAT, &f);
 	variable_delete(res);
@@ -159,7 +159,7 @@ int main(void)
 	/* VT_STRING */
 	if((res = variable_new(VT_STRING, "")) == NULL)
 		return 14;
-	if((ret = marshall_call(res, (MarshallCallback)_call0_string, 0, NULL))
+	if((ret = marshall_callp(res, (MarshallCall)_call0_string, 0, NULL))
 			== 0)
 		ret = variable_get_as(res, VT_STRING, &s);
 	variable_delete(res);

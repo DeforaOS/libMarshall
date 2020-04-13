@@ -34,8 +34,8 @@
 .text
 
 
-/* marshall_call */
-.global SYMBOL(marshall_call)
+/* marshall_callp */
+.global SYMBOL(marshall_callp)
 
 
 /* amd64 */

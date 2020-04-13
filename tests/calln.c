@@ -112,7 +112,7 @@ int main(void)
 		i32 = i;
 		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
 			ret = i + 4;
-		else if(marshall_call(res, (MarshallCallback)_calln, i + 1,
+		else if(marshall_callp(res, (MarshallCall)_calln, i + 1,
 					args) != 0)
 			ret = i + 4;
 		else if(variable_get_as(res, VT_INT32, &i32) != 0 || i32 != 0)

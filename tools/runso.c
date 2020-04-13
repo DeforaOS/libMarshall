@@ -53,7 +53,7 @@ static int _usage(void);
 
 /* functions */
 /* runso */
-static int _runso_callback(char const * method, MarshallCallback callback,
+static int _runso_callback(char const * method, MarshallCall callback,
 		int argc, char ** argv);
 
 static int _runso(char const * filename, char const * method, int argc,
@@ -61,7 +61,7 @@ static int _runso(char const * filename, char const * method, int argc,
 {
 	int ret = 0;
 	void * handler;
-	MarshallCallback callback;
+	MarshallCall callback;
 
 	if((handler = dlopen(filename, RTLD_LAZY)) == NULL)
 		return _error(dlerror(), -1);
@@ -73,7 +73,7 @@ static int _runso(char const * filename, char const * method, int argc,
 	return ret;
 }
 
-static int _runso_callback(char const * method, MarshallCallback callback,
+static int _runso_callback(char const * method, MarshallCall callback,
 		int argc, char ** argv)
 {
 	int ret = 0;
@@ -89,7 +89,7 @@ static int _runso_callback(char const * method, MarshallCallback callback,
 			ret = -_error(error_get(NULL), 1);
 	if((v = variable_new(VT_INT32, &i32)) == NULL)
 		ret = -_error(error_get(NULL), 1);
-	if(ret == 0 && marshall_call(v, callback, argc, args) != 0)
+	if(ret == 0 && marshall_callp(v, callback, argc, args) != 0)
 		ret = -_error(error_get(NULL), 1);
 	else if(variable_get_as(v, VT_INT32, &i32) != 0)
 		ret = _error(error_get(NULL), -1);

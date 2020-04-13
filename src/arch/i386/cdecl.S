@@ -31,8 +31,8 @@
 #include "../common.h"
 
 
-.type marshall_call,@function
-marshall_call:
+.type marshall_callp,@function
+marshall_callp:
 	push	%ebp
 	mov	%esp, %ebp
 	sub	$0x20, %esp			/* VariableType type */

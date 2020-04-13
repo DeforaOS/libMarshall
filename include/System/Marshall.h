@@ -31,18 +31,22 @@
 #ifndef LIBMARSHALL_SYSTEM_MARSHALL_H
 # define LIBMARSHALL_SYSTEM_MARSHALL_H
 
-# include <stddef.h>
+# include <stdarg.h>
 # include <System.h>
 
 
 /* Marshall */
 /* public */
 /* types */
-typedef void(*MarshallCallback)(void);
+typedef void(*MarshallCall)(void);
 
 
 /* prototypes */
-int marshall_call(Variable * ret, MarshallCallback callback,
+int marshall_call(Variable * res, MarshallCall call,
+		size_t args_cnt, ...);
+int marshall_callp(Variable * res, MarshallCall call,
 		size_t args_cnt, Variable ** args);
+int marshall_callv(Variable * res, MarshallCall call,
+		size_t args_cnt, va_list ap);
 
 #endif /* !LIBMARSHALL_SYSTEM_MARSHALL_H */

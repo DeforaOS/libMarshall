@@ -66,7 +66,7 @@ int main(void)
 	/* VT_STRING */
 	if((res = variable_new(VT_STRING, str)) == NULL)
 		return 2;
-	if((ret = marshall_call(res, (MarshallCallback)_calls, 1, &res)) == 0)
+	if((ret = marshall_callp(res, (MarshallCall)_calls, 1, &res)) == 0)
 		ret = variable_get_as(res, VT_STRING, &p);
 	variable_delete(res);
 	if(ret != 0)

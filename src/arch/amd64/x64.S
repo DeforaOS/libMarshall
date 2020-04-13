@@ -30,15 +30,15 @@
 
 
 #if !defined(__APPLE__)
-.type marshall_call,@function
+.type marshall_callp,@function
 #endif
-SYMBOL(marshall_call):
+SYMBOL(marshall_callp):
 	push	%rbp
 	mov	%rsp, %rbp
 	sub	$0xa8, %rsp
 	xor	%rax, %rax
 	mov	%rcx, -0x08(%rbp)		/* Variable * ret */
-	mov	%rdx, -0x10(%rbp)		/* MarshallCallback callback */
+	mov	%rdx, -0x10(%rbp)		/* MarshallCall callback */
 	mov	%r8, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%r9, -0x20(%rbp)		/* Variable ** args */
 	movq	%rax, -0x28(%rbp)		/* VariableType type */
