@@ -37,7 +37,7 @@ SYMBOL(marshall_callp):
 	sub	$0x90, %rsp
 	xor	%rax, %rax
 	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
-	mov	%rsi, -0x10(%rbp)		/* MarshallCall callback */
+	mov	%rsi, -0x10(%rbp)		/* MarshallCall call */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
 	movq	%rax, -0x28(%rbp)		/* VariableType type */
@@ -294,7 +294,7 @@ call:
 	mov	-0x58(%rbp), %r8
 	mov	-0x60(%rbp), %r9
 	mov	-0x10(%rbp), %rax
-	call	*%rax				/* callback() */
+	call	*%rax				/* call() */
 	addq	-0x68(%rbp), %rsp		/* rsp += offset */
 call_done:
 return:
