@@ -81,7 +81,7 @@ int main(void)
 	double d = 1.0;
 
 	/* VT_FLOAT */
-	if((res = variable_new(VT_FLOAT, &f)) == NULL)
+	if((res = variable_new(VT_FLOAT, f)) == NULL)
 		return 2;
 	if((ret = marshall_callp(res, (MarshallCall)_callf_float, 1, &res))
 			== 0)
@@ -92,7 +92,7 @@ int main(void)
 	if(f + 1.0 != (float)M_PI)
 		return 4;
 	/* VT_DOUBLE */
-	if((res = variable_new(VT_DOUBLE, &d)) == NULL)
+	if((res = variable_new(VT_DOUBLE, d)) == NULL)
 		return 5;
 	if((ret = marshall_callp(res, (MarshallCall)_callf_double, 1, &res))
 			== 0)

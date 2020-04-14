@@ -376,22 +376,20 @@ return:
 return_NULL:
 	jmp	return_done
 return_INTEGER:
-	mov	%rax, -0x80(%rbp)
-	lea	-0x80(%rbp), %rdx
-	jmp	return_variable_set_from
+	mov	%rax, %rdx
+	jmp	return_variable_set_type
 return_POINTER:
 	mov	%rax, %rdx
-	jmp	return_variable_set_from
+	jmp	return_variable_set_type
 return_SSE:
-	movaps	%xmm0, -0x80(%rbp)
-	lea	-0x80(%rbp), %rdx
+	mov	$0x1, %rax
 #if 0 /* fallback */
-	jmp	return_variable_set_from
+	jmp	return_variable_set_type
 #endif
-return_variable_set_from:
+return_variable_set_type:
 	mov	-0x08(%rbp), %rcx
 	mov	-0x28(%rbp), %rdx
-	call	FUNC(variable_set_from)
+	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error
 #if 0 /* fallback */

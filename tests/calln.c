@@ -93,7 +93,7 @@ int main(void)
 	Variable * res;
 
 	i32 = 0;
-	if((res = variable_new(VT_INT32, &i32)) == NULL)
+	if((res = variable_new(VT_INT32, i32)) == NULL)
 		return 2;
 	if((args = object_new(sizeof(*args) * count)) == NULL)
 	{
@@ -103,13 +103,13 @@ int main(void)
 	for(i = 0; i < count; i++)
 	{
 		i32 = i * 1111;
-		if((args[i] = variable_new(VT_INT32, &i32)) == NULL)
+		if((args[i] = variable_new(VT_INT32, i32)) == NULL)
 			ret = 3;
 	}
 	for(i = 0; ret == 0 && i < count; i++)
 	{
 		i32 = i;
-		if(variable_set_from(args[0], VT_INT32, &i32) != 0)
+		if(variable_set_type(args[0], VT_INT32, i32) != 0)
 			ret = i + 4;
 		else if(marshall_callp(res, (MarshallCall)_calln, i + 1,
 					args) != 0)
