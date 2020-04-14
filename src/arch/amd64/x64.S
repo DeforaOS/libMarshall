@@ -41,22 +41,22 @@ SYMBOL(marshall_callp):
 	mov	%rdx, -0x10(%rbp)		/* MarshallCall call */
 	mov	%r8, -0x18(%rbp)		/* size_t args_cnt */
 	mov	%r9, -0x20(%rbp)		/* Variable ** args */
-	movq	%rax, -0x28(%rbp)		/* VariableType type */
-	movq	%rax, -0x30(%rbp)		/* size_t args_pos */
-	movq	%rax, -0x38(%rbp)		/* long rcx */
-	movq	%rax, -0x40(%rbp)		/* long rdx */
-	movq	%rax, -0x48(%rbp)		/* long r8 */
-	movq	%rax, -0x50(%rbp)		/* long r9 */
+	movq	%rax, -0x28(%rbp)		/* VariableType type = 0 */
+	movq	%rax, -0x30(%rbp)		/* size_t args_pos = 0 */
+	movq	%rax, -0x38(%rbp)		/* long rcx = 0 */
+	movq	%rax, -0x40(%rbp)		/* long rdx = 0 */
+	movq	%rax, -0x48(%rbp)		/* long r8 = 0 */
+	movq	%rax, -0x50(%rbp)		/* long r9 = 0 */
 	movq	%rax, -0x58(%rbp)		/* XXX padding */
 	movq	%rax, -0x60(%rbp)		/* XXX padding */
-	movq	$0x20, -0x68(%rbp)		/* size_t offset */
-	movq	%rax, -0x70(%rbp)		/* size_t args_cnt_integer */
-	movq	%rax, -0x78(%rbp)		/* uint64_t u64 */
-	movq	%rax, -0x80(%rbp)		/* uint64_t u64 */
-	movq	%rax, -0x88(%rbp)		/* size_t args_cnt_sse */
-	movq	$0x20, -0x90(%rbp)		/* size_t pos */
-	movq	%rax, -0x9f(%rbp)		/* size_t offset2 */
-	movq	%rax, -0xa0(%rbp)		/* size_t */
+	movq	$0x20, -0x68(%rbp)		/* size_t offset = 0x20 */
+	movq	%rax, -0x70(%rbp)		/* size_t args_cnt_integer = 0 */
+	movq	%rax, -0x78(%rbp)		/* uint64_t u64 = 0 */
+	movq	%rax, -0x80(%rbp)
+	movq	%rax, -0x88(%rbp)		/* size_t args_cnt_sse = 0 */
+	movq	$0x20, -0x90(%rbp)		/* size_t pos = 0x20 */
+	movq	%rax, -0x9f(%rbp)		/* size_t offset2 = 0 */
+	movq	%rax, -0xa0(%rbp)
 type:
 	/* get the return type */
 	cmpq	NULL, %rcx
