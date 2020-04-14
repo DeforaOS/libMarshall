@@ -69,8 +69,10 @@ count:
 	mov	-0x18(%rbp), %rdx
 	cmp	%rdx, %rdi
 	je	count_round			/* 	goto count_round */
+#if 0 /* should not happen */
 	jg	count_error			/* else if(args_pos > args_cnt)
 							goto count_error */
+#endif
 count_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rcx
@@ -85,47 +87,21 @@ count_type:
 	jle	count_SSE
 	cmpq	VT_STRING, %rax
 	je	count_INTEGER
-	cmpq	VT_POINTER, %rax
-	je	count_POINTER
 	jmp	count_error
 count_INTEGER:
 	cmpq	$0x5, -0x70(%rbp)
-	jle	count_INTEGER_registers
-	jmp	count_INTEGER_more
+	jg	count_INTEGER_more
+#if 0 /* fallback */
+	jmp	count_INTEGER_registers
+#endif
 count_INTEGER_registers:
 	jmp	count_INTEGER_loop
 count_INTEGER_more:
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+#if 0 /* fallback */
 	jmp	count_INTEGER_loop
+#endif
 count_INTEGER_loop:
-	incq	-0x70(%rbp)			/* args_cnt_integer++ */
-	jmp	count_loop
-count_POINTER:
-	cmpq	$0x5, -0x70(%rbp)
-	jle	count_POINTER_registers
-	jmp	count_POINTER_more
-count_POINTER_registers:
-	jmp	count_POINTER_loop
-count_POINTER_more:
-	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
-	jmp	count_POINTER_loop
-count_POINTER_loop:
-	mov	%rax, %rdx
-	mov	-0x20(%rbp), %rax
-	mov	-0x30(%rbp), %rcx
-	mov	(%rax, %rcx, 8), %rcx
-	lea	-0x78(%rbp), %r8
-	call	FUNC(variable_get_as)
-	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
-	jne	count_error			/*	goto count_error */
-	mov	-0x20(%rbp), %rax
-	mov	-0x30(%rbp), %rcx
-	mov	(%rax, %rcx, 8), %rcx
-	call	FUNC(variable_get_size)
-	/* FIXME really verify the type and recurse through pointers */
-	cmp	$0x0, %rax			/* if(variable_get_size() == 0) */
-	jne	count_error			/*	goto count_error */
-	add	%rax, -0x68(%rbp)		/* offset += %rax */
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	count_loop
 count_SSE:
@@ -168,8 +144,10 @@ args:
 	mov	-0x18(%rbp), %rdx
 	cmp	%rdx, %rdi
 	je	args_done			/* 	goto args_done */
+#if 0 /* should not happen */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto args_error */
+#endif
 args_type:
 	mov	-0x20(%rbp), %rax
 	mov	-0x30(%rbp), %rcx
@@ -184,8 +162,6 @@ args_type:
 	jle	args_SSE
 	cmpq	VT_STRING, %rax
 	je	args_INTEGER
-	cmpq	VT_POINTER, %rax
-	je	args_POINTER
 	jmp	args_error
 args_INTEGER:
 	mov	-0x20(%rbp), %r8
@@ -228,75 +204,6 @@ args_INTEGER_more:
 	jmp	args_INTEGER_loop
 #endif
 args_INTEGER_loop:
-	incq	-0x70(%rbp)			/* args_cnt_integer++ */
-	jmp	args_loop
-args_POINTER:
-	mov	-0x20(%rbp), %r8
-	mov	-0x30(%rbp), %rcx
-	mov	(%r8, %rcx, 8), %rcx
-	mov	%rax, %rdx
-	lea	-0x78(%rbp), %r8
-	call	FUNC(variable_get_as)
-	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
-	jne	args_error			/*	goto args_error */
-	mov	-0x78(%rbp), %rcx
-	call	FUNC(variable_get_type)
-	mov	-0x78(%rbp), %rcx
-	mov	%rax, %rdx
-	mov	%rsp, %r8
-	subq	-0x9f(%rbp), %r8
-	call	FUNC(variable_get_as)
-	cmp	$0x0, %rax
-	jne	error
-	mov	-0x78(%rbp), %rcx
-	call	FUNC(variable_get_size)
-	cmp	$0x0, %rax			/* if(variable_get_size() == 0) */
-	jne	args_error			/*	goto args_error */
-	mov	%rax, %rdi			/* %rdi = %rax */
-	mov	%rsp, %rax			/* %rax = %rsp + offset2 */
-	subq	-0x9f(%rbp), %rax
-	addq	%rdi, -0x9f(%rbp)		/* offset2 += %rdi */
-	cmpq	$0x0, -0x70(%rbp)
-	je	args_POINTER_0
-	cmpq	$0x1, -0x70(%rbp)
-	je	args_POINTER_1
-	cmpq	$0x2, -0x70(%rbp)
-	je	args_POINTER_2
-	cmpq	$0x3, -0x70(%rbp)
-	je	args_POINTER_3
-	cmpq	$0x4, -0x70(%rbp)
-	je	args_POINTER_4
-	cmpq	$0x5, -0x70(%rbp)
-	je	args_POINTER_5
-	jg	args_POINTER_more
-	jmp	error
-args_POINTER_0:
-	mov	%rax, -0x38(%rbp)		/* rdi */
-	jmp	args_POINTER_loop
-args_POINTER_1:
-	mov	%rax, -0x40(%rbp)		/* rsi */
-	jmp	args_POINTER_loop
-args_POINTER_2:
-	mov	%rax, -0x48(%rbp)		/* rdx */
-	jmp	args_POINTER_loop
-args_POINTER_3:
-	mov	%rax, -0x50(%rbp)		/* rcx */
-	jmp	args_POINTER_loop
-args_POINTER_4:
-	mov	%rax, -0x58(%rbp)		/* r8 */
-	jmp	args_POINTER_loop
-args_POINTER_5:
-	mov	%rax, -0x60(%rbp)		/* r9 */
-	jmp	args_POINTER_loop
-args_POINTER_more:
-	mov	%rsp, %rdx			/* rdx = rsp + pos */
-	addq	-0x90(%rbp), %rdx
-	mov	%rax, (%rdx)			/* *rdx = rax */
-	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
-#if 0 /* fallback */
-	jmp	args_POINTER_loop
-#endif
-args_POINTER_loop:
 	incq	-0x70(%rbp)			/* args_cnt_integer++ */
 	jmp	args_loop
 args_SSE:
@@ -397,10 +304,14 @@ return_variable_set_type:
 #endif
 return_done:
 	mov	$0x0, %rax
-	jmp	ret
+	jmp	return_mmx
 error:
 	mov	$-1, %rax
-ret:
+return_mmx:
+	cmpq	$0x0, -0x88(%rbp)		/* if(args_cnt_sse == 0) */
+	je	return_mmx_done			/*	goto return_mmx_done; */
+	emms
+return_mmx_done:
 	mov	%rbp, %rsp
 	pop	%rbp
 	ret
