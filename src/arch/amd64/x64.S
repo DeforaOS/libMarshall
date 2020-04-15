@@ -91,14 +91,14 @@ count_type:
 count_INTEGER:
 	cmpq	$0x5, -0x70(%rbp)
 	jg	count_INTEGER_more
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	count_INTEGER_registers
 #endif
 count_INTEGER_registers:
 	jmp	count_INTEGER_loop
 count_INTEGER_more:
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	count_INTEGER_loop
 #endif
 count_INTEGER_loop:
@@ -107,19 +107,19 @@ count_INTEGER_loop:
 count_SSE:
 	cmpq	$0x7, -0x88(%rbp)
 	jg	count_SSE_more
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jle	count_SSE_registers
 #endif
 count_SSE_registers:
 	jmp	count_SSE_loop
 count_SSE_more:
 	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	count_SSE_loop
 #endif
 count_SSE_loop:
 	incq	-0x88(%rbp)			/* args_cnt_sse++ */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	count_loop
 #endif
 count_loop:
@@ -200,7 +200,7 @@ args_INTEGER_more:
 	addq	-0x90(%rbp), %rdx
 	mov	%rax, (%rdx)			/* *rdx = rax */
 	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	args_INTEGER_loop
 #endif
 args_INTEGER_loop:
@@ -243,12 +243,12 @@ args_SSE_more:
 	mov	-0x80(%rbp), %rcx		/* *rdx = sse */
 	mov	%rcx, (%rdx)
 	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	args_SSE_loop
 #endif
 args_SSE_loop:
 	incq	-0x88(%rbp)			/* args_cnt_sse++ */
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	args_loop
 #endif
 args_loop:
@@ -291,7 +291,7 @@ return_POINTER:
 	jmp	return_variable_set_type
 return_SSE:
 	inc	%rax
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	return_variable_set_type
 #endif
 return_variable_set_type:
@@ -300,7 +300,7 @@ return_variable_set_type:
 	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error
-#if 0 /* fallback */
+#if 0 /* fallthrough */
 	jmp	return_done
 #endif
 return_done:
