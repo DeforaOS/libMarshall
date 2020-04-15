@@ -301,6 +301,7 @@ return:
 	/* report the value returned */
 	cmpq	VT_NULL, -0x28(%rbp)
 	je	return_NULL
+	xor	%rax, %rax
 	/* FIXME make sure it is unsigned */
 	cmpq	VT_UINT64, -0x28(%rbp)
 	jle	return_INTEGER
@@ -318,7 +319,7 @@ return_POINTER:
 	mov	%rax, %rdx
 	jmp	return_variable_set_type
 return_SSE:
-	mov	$0x1, %rax
+	inc	%rax
 #if 0 /* fallback */
 	jmp	return_variable_set_type
 #endif
