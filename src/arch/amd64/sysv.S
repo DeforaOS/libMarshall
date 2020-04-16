@@ -56,7 +56,7 @@ SYMBOL(marshall_callp):
 	movq	%rax, -0x90(%rbp)		/* size_t pos = 0 */
 type:
 	/* get the return type */
-	cmpq	NULL, %rdi
+	cmp	NULL, %rdi
 	je	type_done
 	call	FUNC(variable_get_type)		/* type = variable_get_type() */
 	mov	%rax, -0x28(%rbp)
@@ -153,11 +153,11 @@ args_type:
 	cmp	VT_NULL, %rax
 	je	args_done
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, %rax
+	cmp	VT_UINT64, %rax
 	jle	args_INTEGER
-	cmpq	VT_DOUBLE, %rax
+	cmp	VT_DOUBLE, %rax
 	jle	args_SSE
-	cmpq	VT_STRING, %rax
+	cmp	VT_STRING, %rax
 	je	args_INTEGER
 	jmp	args_error
 args_INTEGER:
