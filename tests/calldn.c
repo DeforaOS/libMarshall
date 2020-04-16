@@ -42,7 +42,7 @@
 
 /* private */
 /* prototypes */
-static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
+static uint32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
 		double arg4, double arg5, double arg6, double arg7,
 		double arg8, double arg9, double arg10, double arg11,
 		double arg12);
@@ -50,14 +50,14 @@ static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
 
 /* functions */
 /* calldn */
-static int32_t _calldn_check(int32_t count, int32_t pos, double * arg);
+static uint32_t _calldn_check(int32_t count, int32_t pos, double * arg);
 
-static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
+static uint32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
 		double arg4, double arg5, double arg6, double arg7,
 		double arg8, double arg9, double arg10, double arg11,
 		double arg12)
 {
-	int32_t ret = 0;
+	uint32_t ret = 0;
 
 	fprintf(stderr, "%s: %s(%d)\n", PROGNAME, __func__, count);
 	ret |= _calldn_check(count, 1, &arg1);
@@ -75,15 +75,15 @@ static int32_t _calldn(int32_t count, double arg1, double arg2, double arg3,
 	return ret;
 }
 
-static int32_t _calldn_check(int32_t count, int32_t pos, double * arg)
+static uint32_t _calldn_check(int32_t count, int32_t pos, double * arg)
 {
 	double d = 1111.1;
 
 	if(pos <= count)
 	{
-		fprintf(stderr, "%d: %f\n", count, *arg);
 		d = d * pos;
-		return (d == (*arg)) ? 0 : 1;
+		fprintf(stderr, "%d: %f (expected: %f)\n", count, *arg, d);
+		return (d == (*arg)) ? 0 : (1 << pos);
 	}
 	return 0;
 }
@@ -98,35 +98,35 @@ int main(void)
 	size_t i;
 	const size_t count = 13;
 	Variable ** args;
-	int32_t i32;
+	uint32_t u32;
 	double d;
 	Variable * res;
 
-	i32 = 0;
-	if((res = variable_new(VT_INT32, i32)) == NULL)
+	if((res = variable_new(VT_UINT32, 0)) == NULL)
 		return 2;
 	if((args = malloc(sizeof(*args) * count)) == NULL)
 	{
 		variable_delete(res);
 		return 2;
 	}
-	for(i = 0; i < count; i++)
+	if((args[0] = variable_new(VT_NULL)) == NULL)
+		ret = 3;
+	for(i = 1; i < count; i++)
 	{
 		d = 1111.1;
 		d = d * i;
 		if((args[i] = variable_new(VT_DOUBLE, d)) == NULL)
-			ret = 3;
+			ret = 4;
 	}
 	for(i = 0; ret == 0 && i < count; i++)
 	{
-		i32 = i;
-		if(variable_set_type(args[0], VT_INT32, i32) != 0)
-			ret = i + 4;
+		if(variable_set_type(args[0], VT_INT32, (int32_t)i) != 0)
+			ret = i + 5;
 		else if(marshall_callp(res, (MarshallCall)_calldn, i + 1,
 					args) != 0)
-			ret = i + 4;
-		else if(variable_get_as(res, VT_INT32, &i32) != 0 || i32 != 0)
-			ret = i + 4;
+			ret = i + 5;
+		else if(variable_get_as(res, VT_UINT32, &u32) != 0 || u32 != 0)
+			ret = i + 5;
 	}
 	for(i = 0; i < count; i++)
 		if(args[i] != NULL)
