@@ -293,15 +293,17 @@ call:
 	mov	-0x50(%rbp), %rcx
 	mov	-0x58(%rbp), %r8
 	mov	-0x60(%rbp), %r9
-	mov	-0x10(%rbp), %rax
-	call	*%rax				/* call() */
+	mov	-0x10(%rbp), %r10
+	/* FIXME may also be 0x8 */
+	mov	-0x88(%rbp), %rax		/* rax = args_cnt_sse & 0x7 */
+	and	$0x7, %rax
+	call	*%r10				/* call() */
 	addq	-0x68(%rbp), %rsp		/* rsp += offset */
 call_done:
 return:
 	/* report the value returned */
 	cmpq	VT_NULL, -0x28(%rbp)
 	je	return_NULL
-	xor	%rax, %rax
 	/* FIXME make sure it is unsigned */
 	cmpq	VT_UINT64, -0x28(%rbp)
 	jle	return_INTEGER
@@ -319,6 +321,7 @@ return_POINTER:
 	mov	%rax, %rdx
 	jmp	return_variable_set_type
 return_SSE:
+	xor	%rax, %rax			/* rax = 1 */
 	inc	%rax
 #if 0 /* fallthrough */
 	jmp	return_variable_set_type
