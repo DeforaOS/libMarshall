@@ -301,34 +301,31 @@ call:
 	addq	-0x68(%rbp), %rsp		/* rsp += offset */
 call_done:
 return:
+	mov	%rax, %rdx
+	xor	%rax, %rax
 	/* report the value returned */
-	cmpq	VT_NULL, -0x28(%rbp)
+	mov	-0x28(%rbp), %rsi
+	cmp	VT_NULL, %rsi
 	je	return_NULL
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, -0x28(%rbp)
+	cmp	VT_UINT64, %rsi
 	jle	return_INTEGER
-	cmpq	VT_DOUBLE, -0x28(%rbp)
+	cmp	VT_DOUBLE, %rsi
 	jle	return_SSE
-	cmpq	VT_STRING, -0x28(%rbp)
-	je	return_POINTER
+	cmp	VT_STRING, %rsi
+	je	return_INTEGER
 	jmp	error
 return_NULL:
 	jmp	return_done
 return_INTEGER:
-	mov	%rax, %rdx
-	jmp	return_variable_set_type
-return_POINTER:
-	mov	%rax, %rdx
 	jmp	return_variable_set_type
 return_SSE:
-	xor	%rax, %rax			/* rax = 1 */
-	inc	%rax
+	inc	%rax				/* rax = 1 */
 #if 0 /* fallthrough */
 	jmp	return_variable_set_type
 #endif
 return_variable_set_type:
-	mov	-0x08(%rbp), %rdi
-	mov	-0x28(%rbp), %rsi
+	mov	-0x08(%rbp), %rdi		/* variable_set_type(ret) */
 	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error
