@@ -30,7 +30,6 @@
 
 #include <inttypes.h>
 #include <stdio.h>
-#include <string.h>
 #include "System/Marshall.h"
 
 #ifndef PROGNAME
@@ -110,7 +109,7 @@ int main(void)
 	float f = -1.0;
 	int32_t r32 = -1;
 	int64_t r64 = -1;
-	char * s;
+	String * s;
 
 	/* VT_INT32 */
 	if((res = variable_new(VT_INT32, r32)) == NULL)
@@ -160,7 +159,8 @@ int main(void)
 	variable_delete(res);
 	if(ret != 0)
 		return 15;
-	if(strcmp(s, "_call0_string") != 0)
+	if(string_compare(s, "_call0_string") != 0)
 		return 16;
+	string_delete(s);
 	return 0;
 }
