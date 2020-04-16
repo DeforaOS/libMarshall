@@ -52,7 +52,6 @@ int marshall_call(Variable * res, MarshallCall call,
 int marshall_callv(Variable * res, MarshallCall call,
 		size_t args_cnt, va_list ap)
 {
-
 	int ret;
 	Variable ** args;
 	size_t i;
