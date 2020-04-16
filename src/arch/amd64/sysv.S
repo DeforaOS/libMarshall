@@ -294,9 +294,11 @@ call:
 	mov	-0x58(%rbp), %r8
 	mov	-0x60(%rbp), %r9
 	mov	-0x10(%rbp), %r10
-	/* FIXME may also be 0x8 */
-	mov	-0x88(%rbp), %rax		/* rax = args_cnt_sse & 0x7 */
-	and	$0x7, %rax
+	mov	-0x88(%rbp), %rax		/* rax = min(args_cnt_sse, 8) */
+	cmp	$0x8, %rax
+	jle	call_do
+	mov	$0x8, %rax
+call_do:
 	call	*%r10				/* call() */
 	addq	-0x68(%rbp), %rsp		/* rsp += offset */
 call_done:
