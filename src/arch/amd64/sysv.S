@@ -36,11 +36,11 @@ SYMBOL(marshall_callp):
 	mov	%rsp, %rbp
 	sub	$0x90, %rsp
 	xor	%rax, %rax
-	mov	%rdi, -0x08(%rbp)		/* Variable * ret */
-	mov	%rsi, -0x10(%rbp)		/* MarshallCall call */
-	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt */
-	mov	%rcx, -0x20(%rbp)		/* Variable ** args */
-	movq	%rax, -0x28(%rbp)		/* VariableType type = 0 */
+	mov	%rdi, -0x08(%rbp)		/* Variable * ret = res */
+	mov	%rsi, -0x10(%rbp)		/* MarshallCall call = call */
+	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt = args_cnt */
+	mov	%rcx, -0x20(%rbp)		/* Variable ** args = args */
+	/* movq	%rax, -0x28(%rbp) */		/* VariableType type = VT_NULL */
 	movq	%rax, -0x30(%rbp)		/* size_t args_pos = 0 */
 	movq	%rax, -0x38(%rbp)		/* long rdi = 0 */
 	movq	%rax, -0x40(%rbp)		/* long rsi = 0 */
