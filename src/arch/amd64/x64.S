@@ -37,11 +37,11 @@ SYMBOL(marshall_callp):
 	mov	%rsp, %rbp
 	sub	$0xa8, %rsp
 	xor	%rax, %rax
-	mov	%rcx, -0x08(%rbp)		/* Variable * ret */
-	mov	%rdx, -0x10(%rbp)		/* MarshallCall call */
-	mov	%r8, -0x18(%rbp)		/* size_t args_cnt */
-	mov	%r9, -0x20(%rbp)		/* Variable ** args */
-	movq	%rax, -0x28(%rbp)		/* VariableType type = 0 */
+	mov	%rcx, -0x08(%rbp)		/* Variable * ret = res */
+	mov	%rdx, -0x10(%rbp)		/* MarshallCall call = call */
+	mov	%r8, -0x18(%rbp)		/* size_t args_cnt = args_cnt */
+	mov	%r9, -0x20(%rbp)		/* Variable ** args = args */
+	/* movq	%rax, -0x28(%rbp) */		/* VariableType type = VT_NULL */
 	movq	%rax, -0x30(%rbp)		/* size_t args_pos = 0 */
 	movq	%rax, -0x38(%rbp)		/* long rcx = 0 */
 	movq	%rax, -0x40(%rbp)		/* long rdx = 0 */
@@ -59,7 +59,7 @@ SYMBOL(marshall_callp):
 	movq	%rax, -0xa0(%rbp)
 type:
 	/* get the return type */
-	cmpq	NULL, %rcx
+	cmp	NULL, %rcx
 	je	type_done
 	call	FUNC(variable_get_type)		/* type = variable_get_type() */
 	mov	%rax, -0x28(%rbp)
@@ -81,11 +81,11 @@ count_type:
 	cmp	VT_NULL, %rax
 	je	count_round
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, %rax
+	cmp	VT_UINT64, %rax
 	jle	count_INTEGER
-	cmpq	VT_DOUBLE, %rax
+	cmp	VT_DOUBLE, %rax
 	jle	count_SSE
-	cmpq	VT_STRING, %rax
+	cmp	VT_STRING, %rax
 	je	count_INTEGER
 	jmp	count_error
 count_INTEGER:
@@ -156,11 +156,11 @@ args_type:
 	cmp	VT_NULL, %rax
 	je	args_done
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, %rax
+	cmp	VT_UINT64, %rax
 	jle	args_INTEGER
-	cmpq	VT_DOUBLE, %rax
+	cmp	VT_DOUBLE, %rax
 	jle	args_SSE
-	cmpq	VT_STRING, %rax
+	cmp	VT_STRING, %rax
 	je	args_INTEGER
 	jmp	args_error
 args_INTEGER:
@@ -264,39 +264,41 @@ call:
 	mov	-0x40(%rbp), %rdx
 	mov	-0x48(%rbp), %r8
 	mov	-0x50(%rbp), %r9
-	mov	-0x10(%rbp), %rax
-	call	*%rax				/* call() */
+	mov	-0x10(%rbp), %r10
+	mov	-0x88(%rbp), %rax		/* rax = min(args_cnt_sse, 4) */
+	cmp	$0x4, %rax
+	jle	call_do
+	mov	$0x4, %rax
+call_do:
+	call	*%r10				/* call() */
 	addq	-0x68(%rbp), %rsp		/* rsp += offset */
 call_done:
 return:
-	/* report the value returned */
-	cmpq	VT_NULL, -0x28(%rbp)
-	je	return_NULL
+	mov	%rax, %r8
 	xor	%rax, %rax
+	/* report the value returned */
+	mov	-0x28(%rbp), %rdx
+	cmp	VT_NULL, %rdx
+	je	return_NULL
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, -0x28(%rbp)
+	cmp	VT_UINT64, %rdx
 	jle	return_INTEGER
-	cmpq	VT_DOUBLE, -0x28(%rbp)
+	cmp	VT_DOUBLE, %rdx
 	jle	return_SSE
-	cmpq	VT_STRING, -0x28(%rbp)
-	je	return_POINTER
+	cmp	VT_STRING, %rdx
+	je	return_INTEGER
 	jmp	error
 return_NULL:
 	jmp	return_done
 return_INTEGER:
-	mov	%rax, %rdx
-	jmp	return_variable_set_type
-return_POINTER:
-	mov	%rax, %rdx
 	jmp	return_variable_set_type
 return_SSE:
-	inc	%rax
+	inc	%rax				/* rax = 1 */
 #if 0 /* fallthrough */
 	jmp	return_variable_set_type
 #endif
 return_variable_set_type:
-	mov	-0x08(%rbp), %rcx
-	mov	-0x28(%rbp), %rdx
+	mov	-0x08(%rbp), %rcx		/* variable_set_type(ret) */
 	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error
