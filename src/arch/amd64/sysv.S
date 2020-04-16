@@ -78,11 +78,11 @@ count_type:
 	cmp	VT_NULL, %rax
 	je	count_round
 	/* FIXME make sure it is unsigned */
-	cmpq	VT_UINT64, %rax
+	cmp	VT_UINT64, %rax
 	jle	count_INTEGER
-	cmpq	VT_DOUBLE, %rax
+	cmp	VT_DOUBLE, %rax
 	jle	count_SSE
-	cmpq	VT_STRING, %rax
+	cmp	VT_STRING, %rax
 	je	count_INTEGER
 	jmp	count_error
 count_INTEGER:
