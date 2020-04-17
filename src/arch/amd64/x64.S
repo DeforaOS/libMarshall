@@ -35,7 +35,7 @@
 SYMBOL(marshall_callp):
 	push	%rbp
 	mov	%rsp, %rbp
-	sub	$0xa8, %rsp
+	sub	$0xc8, %rsp
 	xor	%rax, %rax
 	mov	%rcx, -0x08(%rbp)		/* Variable * ret = res */
 	mov	%rdx, -0x10(%rbp)		/* MarshallCall call = call */
@@ -57,6 +57,7 @@ SYMBOL(marshall_callp):
 	movq	$0x20, -0x90(%rbp)		/* size_t pos = 0x20 */
 	movq	%rax, -0x9f(%rbp)		/* size_t offset2 = 0 */
 	movq	%rax, -0xa0(%rbp)
+						/* double xmm[4] */
 type:
 	/* get the return type */
 	cmp	NULL, %rcx
@@ -211,37 +212,24 @@ args_SSE:
 	mov	-0x30(%rbp), %rcx
 	mov	(%r8, %rcx, 8), %rcx
 	mov	%rax, %rdx
-	lea	-0x80(%rbp), %r8
+	cmpq	$0x4, -0x88(%rbp)
+	jl	args_SSE_registers
+	jge	args_SSE_more
+args_SSE_registers:
+	lea	-0xc8(%rbp), %r8
+	mov	-0x88(%rbp), %r9
+	shl	$0x3, %r9
+	add	%r9, %r8
 	call	FUNC(variable_get_as)
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
-	cmpq	$0x0, -0x88(%rbp)
-	je	args_SSE_0
-	cmpq	$0x1, -0x88(%rbp)
-	je	args_SSE_1
-	cmpq	$0x2, -0x88(%rbp)
-	je	args_SSE_2
-	cmpq	$0x3, -0x88(%rbp)
-	je	args_SSE_3
-	jg	args_SSE_more
-	jmp	error
-args_SSE_0:
-	movaps	-0x80(%rbp), %xmm0
-	jmp	args_SSE_loop
-args_SSE_1:
-	movaps	-0x80(%rbp), %xmm1
-	jmp	args_SSE_loop
-args_SSE_2:
-	movaps	-0x80(%rbp), %xmm2
-	jmp	args_SSE_loop
-args_SSE_3:
-	movaps	-0x80(%rbp), %xmm3
 	jmp	args_SSE_loop
 args_SSE_more:
-	mov	%rsp, %rdx			/* rdx = rsp + pos */
-	addq	-0x90(%rbp), %rdx
-	mov	-0x80(%rbp), %rcx		/* *rdx = sse */
-	mov	%rcx, (%rdx)
+	mov	%rsp, %r8			/* rdx = rsp + pos */
+	addq	-0x90(%rbp), %r8
+	call	FUNC(variable_get_as)
+	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
+	jne	args_error			/*	goto args_error */
 	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
 #if 0 /* fallthrough */
 	jmp	args_SSE_loop
@@ -265,6 +253,10 @@ call:
 	mov	-0x48(%rbp), %r8
 	mov	-0x50(%rbp), %r9
 	mov	-0x10(%rbp), %r10
+	movsd	-0xe8(%rbp), %xmm0
+	movsd	-0xe0(%rbp), %xmm1
+	movsd	-0xd8(%rbp), %xmm2
+	movsd	-0xd0(%rbp), %xmm3
 	mov	-0x88(%rbp), %rax		/* rax = min(args_cnt_sse, 4) */
 	cmp	$0x4, %rax
 	jle	call_do
@@ -289,11 +281,12 @@ return:
 	je	return_INTEGER
 	jmp	error
 return_NULL:
-	jmp	return_done
-return_INTEGER:
-	jmp	return_variable_set_type
+	xor	%rax, %rax
+	jmp	return_do
 return_SSE:
 	inc	%rax				/* rax = 1 */
+	jmp	return_variable_set_type
+return_INTEGER:
 #if 0 /* fallthrough */
 	jmp	return_variable_set_type
 #endif
@@ -302,19 +295,10 @@ return_variable_set_type:
 	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error
-#if 0 /* fallthrough */
-	jmp	return_done
-#endif
-return_done:
-	mov	$0x0, %rax
-	jmp	return_mmx
+	jmp	return_do
 error:
 	mov	$-1, %rax
-return_mmx:
-	cmpq	$0x0, -0x88(%rbp)		/* if(args_cnt_sse == 0) */
-	je	return_mmx_done			/*	goto return_mmx_done; */
-	emms
-return_mmx_done:
+return_do:
 	mov	%rbp, %rsp
 	pop	%rbp
 	ret
