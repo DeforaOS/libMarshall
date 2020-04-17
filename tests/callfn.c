@@ -42,7 +42,7 @@
 
 /* private */
 /* prototypes */
-static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
+static uint32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
 		float arg4, float arg5, float arg6, float arg7,
 		float arg8, float arg9, float arg10, float arg11,
 		float arg12);
@@ -50,14 +50,14 @@ static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
 
 /* functions */
 /* callfn */
-static int32_t _callfn_check(int32_t count, int32_t pos, float * arg);
+static uint32_t _callfn_check(int32_t count, int32_t pos, float * arg);
 
-static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
+static uint32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
 		float arg4, float arg5, float arg6, float arg7,
 		float arg8, float arg9, float arg10, float arg11,
 		float arg12)
 {
-	int32_t ret = 0;
+	uint32_t ret = 0;
 
 	fprintf(stderr, "%s: %s(%d)\n", PROGNAME, __func__, count);
 	ret |= _callfn_check(count, 1, &arg1);
@@ -75,7 +75,7 @@ static int32_t _callfn(int32_t count, float arg1, float arg2, float arg3,
 	return ret;
 }
 
-static int32_t _callfn_check(int32_t count, int32_t pos, float * arg)
+static uint32_t _callfn_check(int32_t count, int32_t pos, float * arg)
 {
 	float flow = 1111.0;
 	float fhigh = 1111.2;
@@ -85,7 +85,7 @@ static int32_t _callfn_check(int32_t count, int32_t pos, float * arg)
 		fprintf(stderr, "%d: %f\n", count, *arg);
 		flow = flow * pos;
 		fhigh = fhigh * pos;
-		return (flow < (*arg) && fhigh > (*arg)) ? 0 : 1;
+		return (flow < (*arg) && fhigh > (*arg)) ? 0 : 1 << pos;
 	}
 	return 0;
 }
@@ -100,35 +100,34 @@ int main(void)
 	size_t i;
 	const size_t count = 13;
 	Variable ** args;
-	int32_t i32;
+	uint32_t u32;
 	float f;
 	Variable * res;
 
-	i32 = 0;
-	if((res = variable_new(VT_INT32, i32)) == NULL)
+	if((res = variable_new(VT_UINT32, 0)) == NULL)
 		return 2;
 	if((args = malloc(sizeof(*args) * count)) == NULL)
 	{
 		variable_delete(res);
-		return 2;
+		return 3;
 	}
-	for(i = 0; i < count; i++)
+	if((args[0] = variable_new(VT_INT32, 0)) == NULL)
+		ret = 4;
+	for(i = 1; i < count; i++)
 	{
-		f = 1111.1;
-		f = f * i;
+		f = 1111.1 * i;
 		if((args[i] = variable_new(VT_FLOAT, f)) == NULL)
-			ret = 3;
+			ret = 5;
 	}
 	for(i = 0; ret == 0 && i < count; i++)
 	{
-		i32 = i;
-		if(variable_set_type(args[0], VT_INT32, i32) != 0)
-			ret = i + 4;
+		if(variable_set(args[0], (int32_t)i) != 0)
+			ret = 6 + (i * 3);
 		else if(marshall_callp(res, (MarshallCall)_callfn, i + 1,
 					args) != 0)
-			ret = i + 4;
-		else if(variable_get_as(res, VT_INT32, &i32) != 0 || i32 != 0)
-			ret = i + 4;
+			ret = 7 + (i * 3);
+		else if(variable_get_as(res, VT_UINT32, &u32) != 0 || u32 != 0)
+			ret = 8 + (i * 3);
 	}
 	for(i = 0; i < count; i++)
 		if(args[i] != NULL)

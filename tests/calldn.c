@@ -107,26 +107,25 @@ int main(void)
 	if((args = malloc(sizeof(*args) * count)) == NULL)
 	{
 		variable_delete(res);
-		return 2;
+		return 3;
 	}
-	if((args[0] = variable_new(VT_NULL)) == NULL)
-		ret = 3;
+	if((args[0] = variable_new(VT_INT32, 0)) == NULL)
+		ret = 4;
 	for(i = 1; i < count; i++)
 	{
-		d = 1111.1;
-		d = d * i;
+		d = 1111.1 * i;
 		if((args[i] = variable_new(VT_DOUBLE, d)) == NULL)
-			ret = 4;
+			ret = 5;
 	}
 	for(i = 0; ret == 0 && i < count; i++)
 	{
-		if(variable_set_type(args[0], VT_INT32, (int32_t)i) != 0)
-			ret = i + 5;
+		if(variable_set(args[0], (int32_t)i) != 0)
+			ret = 6 + (i * 3);
 		else if(marshall_callp(res, (MarshallCall)_calldn, i + 1,
 					args) != 0)
-			ret = i + 5;
+			ret = 7 + (i * 3);
 		else if(variable_get_as(res, VT_UINT32, &u32) != 0 || u32 != 0)
-			ret = i + 5;
+			ret = 8 + (i * 3);
 	}
 	for(i = 0; i < count; i++)
 		if(args[i] != NULL)
