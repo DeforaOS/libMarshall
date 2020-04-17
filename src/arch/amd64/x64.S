@@ -213,7 +213,6 @@ args_SSE:
 	mov	(%r8, %rcx, 8), %rcx
 	mov	%rax, %rdx
 	cmpq	$0x4, -0x88(%rbp)
-	jl	args_SSE_registers
 	jge	args_SSE_more
 args_SSE_registers:
 	lea	-0xc8(%rbp), %r8
