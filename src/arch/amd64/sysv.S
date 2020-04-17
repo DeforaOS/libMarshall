@@ -40,7 +40,7 @@ SYMBOL(marshall_callp):
 	mov	%rsi, -0x10(%rbp)		/* MarshallCall call = call */
 	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt = args_cnt */
 	mov	%rcx, -0x20(%rbp)		/* Variable ** args = args */
-	/* movq	%rax, -0x28(%rbp) */		/* VariableType type = VT_NULL */
+	movq	%rax, -0x28(%rbp)		/* VariableType type = VT_NULL */
 	movq	%rax, -0x30(%rbp)		/* size_t args_pos = 0 */
 	movq	%rax, -0x38(%rbp)		/* long rdi = 0 */
 	movq	%rax, -0x40(%rbp)		/* long rsi = 0 */
@@ -50,8 +50,8 @@ SYMBOL(marshall_callp):
 	movq	%rax, -0x60(%rbp)		/* long r9 = 0 */
 	movq	%rax, -0x68(%rbp)		/* size_t offset = 0 */
 	movq	%rax, -0x70(%rbp)		/* size_t args_cnt_integer = 0 */
-	movq	%rax, -0x78(%rbp)		/* uint64_t u64 = 0 */
-	movq	%rax, -0x80(%rbp)
+	/* movq	%rax, -0x78(%rbp) */		/* uint64_t u64 */
+	/* movq	%rax, -0x80(%rbp) */		/* double d */
 	movq	%rax, -0x88(%rbp)		/* size_t args_cnt_sse = 0 */
 	movq	%rax, -0x90(%rbp)		/* size_t pos = 0 */
 type:
