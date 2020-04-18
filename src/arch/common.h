@@ -63,5 +63,7 @@
 #define VT_DOUBLE	$0xb
 #define VT_BUFFER	$0xc
 #define VT_STRING	$0xd
+#define VT_ARRAY	$0xe
+#define VT_COMPOUND	$0xf
 
 #endif /* !ARCH_COMMON_H */
