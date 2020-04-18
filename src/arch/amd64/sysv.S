@@ -28,43 +28,62 @@
 
 
 
+#define RET			-0x08(%rbp)
+#define CALL			-0x10(%rbp)
+#define ARGS_CNT		-0x18(%rbp)
+#define DIRECTION		-0x20(%rbp)
+#define ARGS			-0x28(%rbp)
+#define TYPE			-0x30(%rbp)
+#define ARGS_POS		-0x38(%rbp)
+#define REG_RDI			-0x40(%rbp)
+#define REG_RSI			-0x48(%rbp)
+#define REG_RDX			-0x50(%rbp)
+#define REG_RCX			-0x58(%rbp)
+#define REG_R8			-0x60(%rbp)
+#define REG_R9			-0x68(%rbp)
+#define OFFSET			-0x70(%rbp)
+#define ARGS_CNT_INTEGER	-0x78(%rbp)
+#define U64			-0x80(%rbp)
+#define ARGS_CNT_SSE		-0x88(%rbp)
+#define POS			-0x90(%rbp)
+#define REG_XMM0		-0xd0(%rbp)
+#define REG_XMM1		-0xc8(%rbp)
+#define REG_XMM2		-0xc0(%rbp)
+#define REG_XMM3		-0xb8(%rbp)
+#define REG_XMM4		-0xb0(%rbp)
+#define REG_XMM5		-0xa8(%rbp)
+#define REG_XMM6		-0xa0(%rbp)
+#define REG_XMM7		-0x98(%rbp)
+
+
 #if !defined(__APPLE__)
-.type marshall_callp,@function
+.type marshall_call_directionp,@function
 #endif
-SYMBOL(marshall_callp):
+SYMBOL(marshall_call_directionp):
 	push	%rbp
 	mov	%rsp, %rbp
 	sub	$0xd0, %rsp
-	xor	%rax, %rax
-	mov	%rdi, -0x08(%rbp)		/* Variable * ret = res */
-	mov	%rsi, -0x10(%rbp)		/* MarshallCall call = call */
-	mov	%rdx, -0x18(%rbp)		/* size_t args_cnt = args_cnt */
-	mov	%rcx, -0x20(%rbp)		/* Variable ** args = args */
-	movq	%rax, -0x28(%rbp)		/* VariableType type = VT_NULL */
-	movq	%rax, -0x30(%rbp)		/* size_t args_pos = 0 */
-	movq	%rax, -0x38(%rbp)		/* long rdi = 0 */
-	movq	%rax, -0x40(%rbp)		/* long rsi = 0 */
-	movq	%rax, -0x48(%rbp)		/* long rdx = 0 */
-	movq	%rax, -0x50(%rbp)		/* long rcx = 0 */
-	movq	%rax, -0x58(%rbp)		/* long r8 = 0 */
-	movq	%rax, -0x60(%rbp)		/* long r9 = 0 */
-	movq	%rax, -0x68(%rbp)		/* size_t offset = 0 */
-	movq	%rax, -0x70(%rbp)		/* size_t args_cnt_integer = 0 */
-	/* movq	%rax, -0x78(%rbp) */		/* uint64_t u64 */
-	/* movq	%rax, -0x80(%rbp) */		/* double d */
-	movq	%rax, -0x88(%rbp)		/* size_t args_cnt_sse = 0 */
-	movq	%rax, -0x90(%rbp)		/* size_t pos = 0 */
-						/* double xmm[8] */
+	mov	%rdi, RET			/* Variable * ret = res */
+	mov	%rsi, CALL			/* MarshallCall call = call */
+	mov	%rdx, ARGS_CNT			/* size_t args_cnt = args_cnt */
+	mov	%rcx, DIRECTION			/* MarshallCallDirection * direction = direction */
+	mov	%r8,  ARGS			/* Variable ** args = args */
+init:
+	lea	REG_XMM0, %rdi
+	xor	%rsi, %rsi
+	mov	$0xa8, %rdx
+	call	FUNC(memset)
 type:
 	/* get the return type */
-	cmp	NULL, %rdi
+	cmp	NULL, RET
 	je	type_done
+	mov	RET, %rdi
 	call	FUNC(variable_get_type)		/* type = variable_get_type() */
-	mov	%rax, -0x28(%rbp)
+	mov	%rax, TYPE
 type_done:
 count:
-	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
-	mov	-0x18(%rbp), %rdx
+	mov	ARGS_POS, %rdi			/* if(args_pos == args_cnt) */
+	mov	ARGS_CNT, %rdx
 	cmp	%rdx, %rdi
 	je	count_round			/* 	goto count_round */
 #if 0 /* should not happen */
@@ -72,8 +91,8 @@ count:
 							goto count_error */
 #endif
 count_type:
-	mov	-0x20(%rbp), %rax
-	mov	-0x30(%rbp), %rdi
+	mov	ARGS, %rax
+	mov	ARGS_POS, %rdi
 	mov	(%rax, %rdi, 8), %rdi
 	call	FUNC(variable_get_type)
 	cmp	VT_NULL, %rax
@@ -87,7 +106,7 @@ count_type:
 	je	count_INTEGER
 	jmp	count_error
 count_INTEGER:
-	cmpq	$0x5, -0x70(%rbp)
+	cmpq	$0x5, ARGS_CNT_INTEGER
 	jg	count_INTEGER_more
 #if 0 /* fallthrough */
 	jmp	count_INTEGER_registers
@@ -95,15 +114,15 @@ count_INTEGER:
 count_INTEGER_registers:
 	jmp	count_INTEGER_loop
 count_INTEGER_more:
-	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	addq	$0x8, OFFSET			/* offset += 8 */
 #if 0 /* fallthrough */
 	jmp	count_INTEGER_loop
 #endif
 count_INTEGER_loop:
-	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	incq	ARGS_CNT_INTEGER		/* args_cnt_integer++ */
 	jmp	count_loop
 count_SSE:
-	cmpq	$0x7, -0x88(%rbp)
+	cmpq	$0x7, ARGS_CNT_SSE
 	jg	count_SSE_more
 #if 0 /* fallthrough */
 	jle	count_SSE_registers
@@ -111,44 +130,46 @@ count_SSE:
 count_SSE_registers:
 	jmp	count_SSE_loop
 count_SSE_more:
-	addq	$0x8, -0x68(%rbp)		/* offset += 8 */
+	addq	$0x8, OFFSET			/* offset += 8 */
 #if 0 /* fallthrough */
 	jmp	count_SSE_loop
 #endif
 count_SSE_loop:
-	incq	-0x88(%rbp)			/* args_cnt_sse++ */
+	incq	ARGS_CNT_SSE			/* args_cnt_sse++ */
 #if 0 /* fallthrough */
 	jmp	count_loop
 #endif
 count_loop:
-	incq	-0x30(%rbp)			/* args_pos++ */
+	incq	ARGS_POS			/* args_pos++ */
 	jmp	count
 count_error:
 	jmp	error
 count_round:
-	mov	-0x68(%rbp), %rax		/* if((offset & 0x8) != 0x0) */
+	mov	OFFSET, %rax			/* if((offset & 0x8) != 0x0) */
 	and	$0x8, %rax
 	cmp	$0x0, %rax
 	je	count_done
-	addq	$0x8, -0x68(%rbp)		/*	offset += 0x8 */
+	addq	$0x8, OFFSET			/*	offset += 0x8 */
 count_done:
-	subq	-0x68(%rbp), %rsp		/* rsp -= offset */
+	subq	OFFSET, %rsp			/* rsp -= offset */
 	xor	%rax, %rax
-	movq	%rax, -0x70(%rbp)		/* args_cnt_integer = 0 */
-	movq	%rax, -0x88(%rbp)		/* args_cnt_sse = 0 */
-	movq	%rax, -0x30(%rbp)		/* args_pos = 0 */
+	movq	%rax, ARGS_CNT_INTEGER		/* args_cnt_integer = 0 */
+	movq	%rax, ARGS_CNT_SSE		/* args_cnt_sse = 0 */
+	movq	%rax, ARGS_POS			/* args_pos = 0 */
 args:
-	mov	-0x30(%rbp), %rdi		/* if(args_pos == args_cnt) */
-	mov	-0x18(%rbp), %rdx
+	mov	ARGS_POS, %rdi			/* if(args_pos == args_cnt) */
+	mov	ARGS_CNT, %rdx
 	cmp	%rdx, %rdi
 	je	args_done			/* 	goto args_done */
 #if 0 /* should not happen */
 	jg	args_error			/* else if(args_pos > args_cnt)
 							goto args_error */
 #endif
+args_direction:
+	/* FIXME implement */
 args_type:
-	mov	-0x20(%rbp), %rax
-	mov	-0x30(%rbp), %rdi
+	mov	ARGS, %rax
+	mov	ARGS_POS, %rdi
 	mov	(%rax, %rdi, 8), %rdi
 	call	FUNC(variable_get_type)
 	cmp	VT_NULL, %rax
@@ -162,68 +183,68 @@ args_type:
 	je	args_INTEGER
 	jmp	args_error
 args_INTEGER:
-	mov	-0x20(%rbp), %rdx
-	mov	-0x30(%rbp), %rdi
+	mov	ARGS, %rdx
+	mov	ARGS_POS, %rdi
 	mov	(%rdx, %rdi, 8), %rdi
 	mov	%rax, %rsi
-	lea	-0x78(%rbp), %rdx
+	lea	U64, %rdx
 	call	FUNC(variable_get_as)
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
-	mov	-0x78(%rbp), %rax
-	cmpq	$0x0, -0x70(%rbp)
+	mov	U64, %rax
+	cmpq	$0x0, ARGS_CNT_INTEGER
 	je	args_INTEGER_0
-	cmpq	$0x1, -0x70(%rbp)
+	cmpq	$0x1, ARGS_CNT_INTEGER
 	je	args_INTEGER_1
-	cmpq	$0x2, -0x70(%rbp)
+	cmpq	$0x2, ARGS_CNT_INTEGER
 	je	args_INTEGER_2
-	cmpq	$0x3, -0x70(%rbp)
+	cmpq	$0x3, ARGS_CNT_INTEGER
 	je	args_INTEGER_3
-	cmpq	$0x4, -0x70(%rbp)
+	cmpq	$0x4, ARGS_CNT_INTEGER
 	je	args_INTEGER_4
-	cmpq	$0x5, -0x70(%rbp)
+	cmpq	$0x5, ARGS_CNT_INTEGER
 	je	args_INTEGER_5
 	jg	args_INTEGER_more
 	jmp	error
 args_INTEGER_0:
-	mov	%rax, -0x38(%rbp)		/* rdi */
+	mov	%rax, REG_RDI			/* rdi */
 	jmp	args_INTEGER_loop
 args_INTEGER_1:
-	mov	%rax, -0x40(%rbp)		/* rsi */
+	mov	%rax, REG_RSI			/* rsi */
 	jmp	args_INTEGER_loop
 args_INTEGER_2:
-	mov	%rax, -0x48(%rbp)		/* rdx */
+	mov	%rax, REG_RDX			/* rdx */
 	jmp	args_INTEGER_loop
 args_INTEGER_3:
-	mov	%rax, -0x50(%rbp)		/* rcx */
+	mov	%rax, REG_RCX			/* rcx */
 	jmp	args_INTEGER_loop
 args_INTEGER_4:
-	mov	%rax, -0x58(%rbp)		/* r8 */
+	mov	%rax, REG_R8			/* r8 */
 	jmp	args_INTEGER_loop
 args_INTEGER_5:
-	mov	%rax, -0x60(%rbp)		/* r9 */
+	mov	%rax, REG_R9			/* r9 */
 	jmp	args_INTEGER_loop
 args_INTEGER_more:
 	mov	%rsp, %rdx			/* rdx = rsp + pos */
-	addq	-0x90(%rbp), %rdx
+	addq	POS, %rdx
 	mov	%rax, (%rdx)			/* *rdx = rax */
-	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
+	addq	$0x8, POS			/* pos += 8 */
 #if 0 /* fallthrough */
 	jmp	args_INTEGER_loop
 #endif
 args_INTEGER_loop:
-	incq	-0x70(%rbp)			/* args_cnt_integer++ */
+	incq	ARGS_CNT_INTEGER		/* args_cnt_integer++ */
 	jmp	args_loop
 args_SSE:
-	mov	-0x20(%rbp), %rdx
-	mov	-0x30(%rbp), %rdi
+	mov	ARGS, %rdx
+	mov	ARGS_POS, %rdi
 	mov	(%rdx, %rdi, 8), %rdi
 	mov	%rax, %rsi
-	cmpq	$0x8, -0x88(%rbp)
+	cmpq	$0x8, ARGS_CNT_SSE
 	jge	args_SSE_more
 args_SSE_registers:
-	lea	-0xd0(%rbp), %rdx
-	mov	-0x88(%rbp), %rcx
+	lea	REG_XMM0, %rdx
+	mov	ARGS_CNT_SSE, %rcx
 	shl	$0x3, %rcx
 	add	%rcx, %rdx
 	call	FUNC(variable_get_as)
@@ -232,56 +253,56 @@ args_SSE_registers:
 	jmp	args_SSE_loop
 args_SSE_more:
 	mov	%rsp, %rdx			/* rdx = rsp + pos */
-	addq	-0x90(%rbp), %rdx
+	addq	POS, %rdx
 	call	FUNC(variable_get_as)
 	cmp	$0x0, %rax			/* if(variable_get_as() != 0) */
 	jne	args_error			/*	goto args_error */
-	addq	$0x8, -0x90(%rbp)		/* pos += 8 */
+	addq	$0x8, POS			/* pos += 8 */
 #if 0 /* fallthrough */
 	jmp	args_SSE_loop
 #endif
 args_SSE_loop:
-	incq	-0x88(%rbp)			/* args_cnt_sse++ */
+	incq	ARGS_CNT_SSE			/* args_cnt_sse++ */
 #if 0 /* fallthrough */
 	jmp	args_loop
 #endif
 args_loop:
-	incq	-0x30(%rbp)			/* args_pos++ */
+	incq	ARGS_POS			/* args_pos++ */
 	jmp	args
 args_error:
-	addq	-0x68(%rbp), %rsp		/* rsp += offset */
+	addq	OFFSET, %rsp			/* rsp += offset */
 	jmp	error
 args_done:
 call:
 	/* call the function */
-	mov	-0x38(%rbp), %rdi
-	mov	-0x40(%rbp), %rsi
-	mov	-0x48(%rbp), %rdx
-	mov	-0x50(%rbp), %rcx
-	mov	-0x58(%rbp), %r8
-	mov	-0x60(%rbp), %r9
-	mov	-0x10(%rbp), %r10
-	movsd	-0xd0(%rbp), %xmm0
-	movsd	-0xc8(%rbp), %xmm1
-	movsd	-0xc0(%rbp), %xmm2
-	movsd	-0xb8(%rbp), %xmm3
-	movsd	-0xb0(%rbp), %xmm4
-	movsd	-0xa8(%rbp), %xmm5
-	movsd	-0xa0(%rbp), %xmm6
-	movsd	-0x98(%rbp), %xmm7
-	mov	-0x88(%rbp), %rax		/* rax = min(args_cnt_sse, 8) */
+	mov	REG_RDI, %rdi
+	mov	REG_RSI, %rsi
+	mov	REG_RDX, %rdx
+	mov	REG_RCX, %rcx
+	mov	REG_R8, %r8
+	mov	REG_R9, %r9
+	movsd	REG_XMM0, %xmm0
+	movsd	REG_XMM1, %xmm1
+	movsd	REG_XMM2, %xmm2
+	movsd	REG_XMM3, %xmm3
+	movsd	REG_XMM4, %xmm4
+	movsd	REG_XMM5, %xmm5
+	movsd	REG_XMM6, %xmm6
+	movsd	REG_XMM7, %xmm7
+	mov	ARGS_CNT_SSE, %rax		/* rax = min(args_cnt_sse, 8) */
 	cmp	$0x8, %rax
 	jle	call_do
 	mov	$0x8, %rax
 call_do:
+	mov	CALL, %r10
 	call	*%r10				/* call() */
-	addq	-0x68(%rbp), %rsp		/* rsp += offset */
+	addq	OFFSET, %rsp			/* rsp += offset */
 call_done:
 return:
 	mov	%rax, %rdx
 	xor	%rax, %rax
 	/* report the value returned */
-	mov	-0x28(%rbp), %rsi
+	mov	TYPE, %rsi
 	cmp	VT_NULL, %rsi
 	je	return_NULL
 	/* FIXME make sure it is unsigned */
@@ -303,7 +324,7 @@ return_INTEGER:
 	jmp	return_variable_set_type
 #endif
 return_variable_set_type:
-	mov	-0x08(%rbp), %rdi		/* variable_set_type(ret) */
+	mov	RET, %rdi			/* variable_set_type(ret) */
 	call	FUNC(variable_set_type)
 	cmp	$0x0, %rax
 	jne	error

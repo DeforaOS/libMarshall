@@ -48,6 +48,15 @@ int marshall_call(Variable * res, MarshallCall call,
 }
 
 
+/* marshall_callp */
+int marshall_callp(Variable * res, MarshallCall call, size_t args_cnt,
+		Variable ** args)
+{
+	/* FIXME set the directions */
+	return marshall_call_directionp(res, call, args_cnt, NULL, args);
+}
+
+
 /* marshall_callv */
 int marshall_callv(Variable * res, MarshallCall call,
 		size_t args_cnt, va_list ap)
