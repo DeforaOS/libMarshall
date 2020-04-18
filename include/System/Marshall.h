@@ -39,6 +39,12 @@
 /* public */
 /* types */
 typedef void(*MarshallCall)(void);
+typedef enum _MarshallCallDirection
+{
+	MCD_IN = 1,
+	MCD_OUT,
+	MCD_IN_OUT
+} MarshallCallDirection;
 
 
 /* prototypes */
@@ -47,6 +53,13 @@ int marshall_call(Variable * res, MarshallCall call,
 int marshall_callp(Variable * res, MarshallCall call,
 		size_t args_cnt, Variable ** args);
 int marshall_callv(Variable * res, MarshallCall call,
+		size_t args_cnt, va_list ap);
+
+int marshall_call_direction(Variable * res, MarshallCall call,
+		size_t args_cnt, ...);
+int marshall_call_directionp(Variable * res, MarshallCall call, size_t args_cnt,
+		MarshallCallDirection * direction, Variable ** args);
+int marshall_call_directionv(Variable * res, MarshallCall call,
 		size_t args_cnt, va_list ap);
 
 #endif /* !LIBMARSHALL_SYSTEM_MARSHALL_H */

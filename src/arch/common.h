@@ -66,4 +66,8 @@
 #define VT_ARRAY	$0xe
 #define VT_COMPOUND	$0xf
 
+#define MCD_IN		$0x1
+#define MCD_OUT		$0x2
+#define MCD_IN_OUT	$0x3
+
 #endif /* !ARCH_COMMON_H */
