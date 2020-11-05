@@ -52,8 +52,21 @@ int marshall_call(Variable * res, MarshallCall call,
 int marshall_callp(Variable * res, MarshallCall call, size_t args_cnt,
 		Variable ** args)
 {
-	/* FIXME set the directions */
-	return marshall_call_directionp(res, call, args_cnt, NULL, args);
+	int ret;
+	MarshallCallDirection * directions;
+	size_t i;
+
+	if(args_cnt == 0)
+		directions = NULL;
+	else if((directions = object_new(sizeof(*directions) * args_cnt))
+			== NULL)
+		return -1;
+	else
+		for(i = 0; i < args_cnt; i++)
+			directions[i] = MCD_IN;
+	ret = marshall_call_directionp(res, call, args_cnt, directions, args);
+	object_delete(directions);
+	return ret;
 }
 
 
