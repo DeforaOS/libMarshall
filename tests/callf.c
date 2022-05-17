@@ -85,7 +85,7 @@ int main(void)
 		return 2;
 	if((ret = marshall_callp(res, (MarshallCall)_callf_float, 1, &res))
 			== 0)
-		ret = variable_get_as(res, VT_FLOAT, &f);
+		ret = variable_get_as(res, VT_FLOAT, &f, NULL);
 	variable_delete(res);
 	if(ret != 0)
 		return 3;
@@ -96,7 +96,7 @@ int main(void)
 		return 5;
 	if((ret = marshall_callp(res, (MarshallCall)_callf_double, 1, &res))
 			== 0)
-		ret = variable_get_as(res, VT_DOUBLE, &d);
+		ret = variable_get_as(res, VT_DOUBLE, &d, NULL);
 	variable_delete(res);
 	if(ret != 0)
 		return 6;

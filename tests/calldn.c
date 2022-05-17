@@ -124,7 +124,7 @@ int main(void)
 		else if(marshall_callp(res, (MarshallCall)_calldn, i + 1,
 					args) != 0)
 			ret = 7 + (i * 3);
-		else if(variable_get_as(res, VT_UINT32, &u32) != 0 || u32 != 0)
+		else if(variable_get_as(res, VT_UINT32, &u32, NULL) != 0 || u32 != 0)
 			ret = 8 + (i * 3);
 	}
 	for(i = 0; i < count; i++)

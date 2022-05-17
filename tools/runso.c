@@ -91,7 +91,7 @@ static int _runso_callback(char const * method, MarshallCall callback,
 		ret = -_error(error_get(NULL), 1);
 	if(ret == 0 && marshall_callp(v, callback, argc, args) != 0)
 		ret = -_error(error_get(NULL), 1);
-	else if(variable_get_as(v, VT_INT32, &i32) != 0)
+	else if(variable_get_as(v, VT_INT32, &i32, NULL) != 0)
 		ret = _error(error_get(NULL), -1);
 	else
 		printf("%s: %s returned %d\n", PROGNAME, method, i32);
