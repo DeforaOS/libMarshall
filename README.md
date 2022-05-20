@@ -22,6 +22,7 @@ libMarshall depends on the following components:
   system.
 
 And optionally:
+
 * configure from the DeforaOS Project, likewise found at
   <https://www.defora.org/os/project/16/configure>
 * GTK-Doc (for the API documentation), found at
