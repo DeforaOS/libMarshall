@@ -12,19 +12,20 @@ message-passing framework at the core of the DeforaOS Project.
 Dependencies for libMarshall
 ----------------------------
 
-libMarshall depends on the following software components:
-- pkg-config from the freedesktop software collection, as found in most
-  software distributions already; otherwise at
-  <http://www.freedesktop.org/wiki/Software/pkg-config/>
-- libSystem from the DeforaOS Project, as found at
+libMarshall depends on the following components:
+
+* pkg-config (or equivalent tool) from the freedesktop software collection, as
+  found in most software distributions already; otherwise at
+  <https://www.freedesktop.org/wiki/Software/pkg-config/>
+* libSystem from the DeforaOS Project, as found at
   <https://www.defora.org/os/project/27/libSystem> if not packaged for your
   system.
 
 And optionally:
-- configure from the DeforaOS Project, likewise found at
+* configure from the DeforaOS Project, likewise found at
   <https://www.defora.org/os/project/16/configure>
-- GTK-Doc (for the API documentation), found at
-  <http://www.gtk.org/gtk-doc/>
+* GTK-Doc (for the API documentation), found at
+  <https://www.gtk.org/gtk-doc/>
 
 
 Configuring libMarshall
@@ -40,8 +41,8 @@ Please refer to the documentation of DeforaOS configure for further
 instructions.
 
 A default set of Makefiles is provided with releases of this project in order
-to help building and packaging. The Makefiles provided target the NetBSD
-Operating System <https://www.netbsd.org/> by default, but should work on most
+to help building and packaging. The Makefiles provided target the [NetBSD
+Operating System](https://www.netbsd.org/) by default, but should work on most
 platforms without changes.
 
 
@@ -59,3 +60,9 @@ To build libMarshall for installation in a different directory than the default
     $ make PREFIX="/path/to/destination"
 
 Then use the `install` target to effectively install libMarshall on the system.
+
+libMarshall also supports `DESTDIR`, to be installed in a staging directory; for
+instance:
+
+    $ make DESTDIR="/staging/directory" PREFIX="/another/prefix" install
+
