@@ -1,4 +1,7 @@
+*.dylib
 *.o
+*.so
+*.so.*
 Makefile
 /config.ent
 /config.h
