@@ -46,6 +46,7 @@
 /* prototypes */
 static int _runso(char const * filename, char const * method, int argc,
 		char ** argv);
+static int _runso_list(char const * filename);
 
 static int _error(char const * error, int ret);
 static int _usage(void);
@@ -105,6 +106,14 @@ static int _runso_callback(char const * method, MarshallCall callback,
 }
 
 
+/* runso_list */
+static int _runso_list(char const * filename)
+{
+	/* FIXME implement */
+	return -1;
+}
+
+
 /* error */
 static int _error(char const * error, int ret)
 {
@@ -116,9 +125,10 @@ static int _error(char const * error, int ret)
 /* usage */
 static int _usage(void)
 {
-	/* TODO allow listing the methods available */
 	fputs("Usage: " PROGNAME " filename method [arguments...]\n"
+"       " PROGNAME " -l filename\n"
 "       " PROGNAME " -s method [arguments...]\n"
+"  -l	List the methods available\n"
 "  -s	Look for callbacks inside " PROGNAME " itself\n", stderr);
 	return 1;
 }
@@ -129,29 +139,44 @@ static int _usage(void)
 /* main */
 int main(int argc, char * argv[])
 {
+	int ret = 0;
 	int o;
+	int list = 0;
 	int self = 0;
 	char const * filename;
 	char const * method;
 
-	while((o = getopt(argc, argv, "s")) != -1)
+	while((o = getopt(argc, argv, "ls")) != -1)
 		switch(o)
 		{
+			case 'l':
+				list = 1;
+				self = 0;
+				break;
 			case 's':
+				list = 0;
 				self = 1;
 				break;
 			default:
 				return _usage();
 		}
-	if(self)
-		filename = NULL;
-	else
-		filename = argv[optind++];
 	/* check usage accordingly */
-	if(optind >= argc)
+	if(list != 0 && optind + 1 == argc)
+	{
+		if(_runso_list(argv[optind]) != 0)
+			ret = 2;
+	}
+	else if(list == 0 && optind < argc)
+	{
+		if(self)
+			filename = NULL;
+		else
+			filename = argv[optind++];
+		method = argv[optind++];
+		if(_runso(filename, method, argc - optind, &argv[optind]) != 0)
+			ret = 2;
+	}
+	else
 		return _usage();
-	method = argv[optind++];
-	if(_runso(filename, method, argc - optind, &argv[optind]) != 0)
-		return 2;
-	return 0;
+	return ret;
 }
