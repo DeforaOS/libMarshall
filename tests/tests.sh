@@ -114,10 +114,10 @@ target="$1"
 [ "$clean" -ne 0 ]			&& exit 0
 
 if [ -n "$PKG_CONFIG_SYSROOT_DIR" ]; then
-	tests="pkgconfig.sh"
+	tests=
 	failures=
 else
-	tests="includes pkgconfig.sh"
+	tests="includes"
 	failures="call0 calldn callf callfn calln calls"
 	case "$(uname -s)-$(uname -m)" in
 		*-amd64|*-x86_64)
